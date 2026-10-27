@@ -76,18 +76,18 @@
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
-                alert('Пожалуйста, введите текст!');
+                alert('Пожалуйста, введите text!');
                 return;
             }
             
             // Формируем текст, который пользователь отправит в чат бота
             const messageText = encodeURIComponent(`🎃 Данные из Mini App:\n${text}`);
             
-            // Универсальная команда отправки текста, которая работает во всех встроенных браузерах Telegram
-            const shareUrl = `https://t.me{shareUrlText}`;
+            // Универсальная команда, которая работает во всех встроенных браузерах Telegram
+            const shareUrl = `https://t.me{messageText}`;
             
-            // Перенаправляем браузер — откроется окно выбора чата, где верхним будет ваш бот
-            window.location.href = `https://t.me{messageText}`;
+            // Перенаправляем браузер — откроется окно выбора чата мессенджера
+            window.location.href = shareUrl;
         }
     </script>
 </body>
