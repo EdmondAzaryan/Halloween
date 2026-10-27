@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween Mini App</title>
+    <!-- Официальный скрипт Telegram -->
+    <script src="https://telegram.org"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -59,99 +61,37 @@
     <input type="text" id="userInput" placeholder="Напишите что-то боту..." />
     <button onclick="sendDataToBot()">Отправить в бота</button>
 
-    <div id="response-box">Проверка Telegram...</div>
+    <div id="response-box">Загрузка данных...</div>
 
     <script>
-        // --- Встроенный официальный компактный WebView/WebApp SDK Telegram ---
-        (function() {
-            var eventHandlers = {};
-            var locationHash = '';
-            try { locationHash = location.hash.toString(); } catch (e) {}
-            
-            function urlSafeDecode(urlencoded) {
-                try { return decodeURIComponent(urlencoded.replace(/\+/g, '%20')); } catch (e) { return urlencoded; }
-            }
-            function urlParseHashParams(locationHash) {
-                locationHash = locationHash.replace(/^#/, '');
-                var params = {};
-                if (!locationHash.length) return params;
-                var qIndex = locationHash.indexOf('?');
-                if (qIndex >= 0) locationHash = locationHash.substr(qIndex + 1);
-                var queryStringParams = locationHash.split('&');
-                for (var i = 0; i < queryStringParams.length; i++) {
-                    var param = queryStringParams[i].split('=');
-                    params[urlSafeDecode(param[0])] = param[1] == null ? null : urlSafeDecode(param[1]);
-                }
-                return params;
-            }
-            function postEvent(eventType, callback, eventData) {
-                if (!callback) callback = function () {};
-                if (eventData === undefined) eventData = '';
-                if (window.TelegramWebviewProxy !== undefined) {
-                    TelegramWebviewProxy.postEvent(eventType, JSON.stringify(eventData));
-                    callback();
-                } else if (window.parent && window.parent.postMessage) {
-                    window.parent.postMessage(JSON.stringify({eventType: eventType, eventData: eventData}), '*');
-                    callback();
-                } else { callback({notAvailable: true}); }
-            }
-
-            var initParams = urlParseHashParams(locationHash);
-            var WebApp = {
-                initData: initParams.tgWebAppData || '',
-                version: initParams.tgWebAppVersion || '6.0',
-                platform: initParams.tgWebAppPlatform || 'unknown',
-                ready: function() { postEvent('web_app_ready'); },
-                expand: function() { postEvent('web_app_expand'); },
-                close: function() { postEvent('web_app_close'); },
-                sendData: function(data) { postEvent('web_app_data_send', false, {data: data}); }
-            };
-            if (!window.Telegram) window.Telegram = {};
-            window.Telegram.WebApp = WebApp;
-        })();
-
-        // --- Логика нашего Mini App ---
-        function checkTelegram() {
-            const tg = window.Telegram?.WebApp;
-
-            // Если запуск был выполнен внутри Telegram, то у нас будут параметры платформы или initData
-            if (tg && (tg.initData || tg.platform !== 'unknown')) {
-                tg.ready();
-                tg.expand();
-
-                // Считываем время, переданное ботом из URL
-                const urlParams = new URLSearchParams(window.location.search);
-                const timeParam = urlParams.get('time');
-
-                if (timeParam) {
-                    document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
-                } else {
-                    document.getElementById('response-box').innerText = "Mini App готов к работе!";
-                }
-            } else {
-                document.getElementById('response-box').innerText = "Критическая ошибка: Запущено как обычный сайт, функции Telegram отключены!";
-                document.getElementById('response-box').style.borderColor = "red";
-                document.getElementById('response-box').style.color = "red";
-            }
+        // Принудительно вызываем готовность
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
         }
 
+        // Читаем параметры из URL (Из бота в Mini App)
+        const urlParams = new URLSearchParams(window.location.search);
+        const timeParam = urlParams.get('time');
+        
+        if (timeParam) {
+            document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
+        } else {
+            document.getElementById('response-box').innerText = "Mini App готов к отправке данных!";
+        }
+
+        // Отправка данных (Из Mini App в бот)
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
-                alert('Пожалуйста, введите текст перед отправкой!');
+                alert('Пожалуйста, введите текст!');
                 return;
             }
             
-            const tg = window.Telegram?.WebApp;
-            if (tg && (tg.initData || tg.platform !== 'unknown')) {
-                tg.sendData(text);
-                tg.close();
-            } else {
-                alert('Ошибка: Невозможно отправить данные вне Telegram WebApp!');
-            }
+            // Прямой вызов отправки без условий и проверок
+            window.Telegram.WebApp.sendData(text);
+            window.Telegram.WebApp.close();
         }
-
-        window.onload = checkTelegram;
     </script>
 </body>
 </html>
