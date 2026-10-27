@@ -3,104 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Запрещаем кэширование -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Halloween Mini App</title>
-    <!-- Скрипт Telegram -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: sans-serif;
             background-color: #1a1a1a;
-            color: #ffffff;
+            color: #fff;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
-            gap: 15px;
-            box-sizing: border-box;
         }
         input, button {
-            width: 100%;
-            max-width: 300px;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 1px solid #ffaa00;
+            width: 100%; max-width: 300px; padding: 12px;
+            font-size: 16px; border-radius: 8px; margin-bottom: 15px;
             box-sizing: border-box;
         }
-        input { background-color: #2b2b2b; color: #fff; }
+        input { background-color: #2b2b2b; color: #fff; border: 1px solid #ffaa00; }
         button {
-            background-color: #ffaa00;
-            color: #000000;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        #response-box {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-            width: 100%;
-            max-width: 300px;
-            word-break: break-word;
-            text-align: center;
-            border: 1px dashed #ffaa00;
+            background-color: #ffaa00; color: #000; font-weight: bold;
+            border: none; cursor: pointer;
         }
     </style>
 </head>
 <body>
     <h2>Halloween Mini App 🎃</h2>
     <input type="text" id="userInput" placeholder="Напишите что-то боту..." />
-    <button onclick="sendDataToBot()">Отправить в бота</button>
-    <div id="response-box">Загрузка данных...</div>
+    <button onclick="sendData()">Отправить в бота</button>
 
     <script>
-        // Ловим любые ошибки JS и показываем их на экране
-        window.onerror = function(msg) {
-            alert("ОШИБКА: " + msg);
-        };
-
         const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
-        }
+        if (tg) tg.ready();
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const timeParam = urlParams.get('time');
-
-        document.getElementById('response-box').innerText = timeParam
-            ? "Информация из бота: " + timeParam
-            : "Mini App готов к работе!";
-
-        function sendDataToBot() {
+        function sendData() {
             const text = document.getElementById('userInput').value.trim();
             if (!text) {
-                alert('Пожалуйста, введите текст!');
+                alert('Введите текст!');
                 return;
             }
 
-            // ПРОВЕРКА: Если открыто не в Телеграме
-            if (!tg || !tg.initData) {
-                document.getElementById('response-box').innerText = "⚠️ Откройте через бота в Telegram!";
-                alert("Ошибка: Скрипт Telegram не видит, что вы в Телеграме. Попробуйте перезапустить Телеграм.");
-                return;
-            }
+            // Получаем имя бота из URL (которое передал Python)
+            const urlParams = new URLSearchParams(window.location.search);
+            const botUsername = urlParams.get('bot') || "Bshshzj_bot"; // Если нет - ставим твой
 
-            try {
-                // Отправляем данные боту
-                const payload = JSON.stringify({ text: text });
-                tg.sendData(payload);
-            } catch (e) {
-                alert("Ошибка при отправке: " + e.message);
-            }
+            // Заменяем пробелы на _, так как Телеграм не любит пробелы в ссылках
+            const safeText = encodeURIComponent(text.replace(/\s+/g, '_'));
+
+            // Формируем ссылку. ВАЖНО: здесь используется startapp, а не start!
+            const deepLink = `https://t.me/${botUsername}?startapp=${safeText}`;
+
+            // Открываем Телеграм по этой ссылке (Mini App закроется, откроется чат с ботом)
+            window.location.href = deepLink;
         }
     </script>
 </body>
