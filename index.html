@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween Mini App</title>
+    <!-- ОБЯЗАТЕЛЬНО: подключаем telegram-web-app.js -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -14,7 +16,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             gap: 15px;
             box-sizing: border-box;
@@ -28,10 +30,7 @@
             border: 1px solid #ffaa00;
             box-sizing: border-box;
         }
-        input {
-            background-color: #2b2b2b;
-            color: #fff;
-        }
+        input { background-color: #2b2b2b; color: #fff; }
         button {
             background-color: #ffaa00;
             color: #000000;
@@ -53,43 +52,48 @@
     </style>
 </head>
 <body>
-
     <h2>Halloween Mini App 🎃</h2>
-    
+
     <input type="text" id="userInput" placeholder="Напишите что-то боту..." />
     <button onclick="sendDataToBot()">Отправить в бота</button>
 
     <div id="response-box">Загрузка данных...</div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const timeParam = urlParams.get('time');
-        const botUsername = urlParams.get('bot'); // Забираем юзернейм бота, переданный сервером
-
-        if (timeParam) {
-            document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
-        } else {
-            document.getElementById('response-box').innerText = "Mini App готов к работе!";
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
         }
 
+        // Читаем параметры, которые бот передал в URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const timeParam = urlParams.get('time');
+
+        document.getElementById('response-box').innerText = timeParam
+            ? "Информация из бота: " + timeParam
+            : "Mini App готов к работе!";
+
         function sendDataToBot() {
-            const text = document.getElementById('userInput').value;
-            if (!text.trim()) {
+            const text = document.getElementById('userInput').value.trim();
+            if (!text) {
                 alert('Пожалуйста, введите текст!');
                 return;
             }
-            
-            // Если имя бота почему-то не прилетело, ставим твой юзернейм по умолчанию
-            const targetBot = botUsername ? botUsername : "Bshshzj_bot";
-            
-            // Заменяем пробелы на нижнее подчеркивание, так как Telegram не любит пробелы в командах старта
-            const cleanText = encodeURIComponent(text.trim().replace(/\s+/g, '_'));
-            
-            // Глубокая ссылка, которая перезапустит твоего бота и передаст ему этот текст напрямую
-            const deepLink = "https://t.me" + targetBot + "?start=" + cleanText;
-            
-            // Перенаправляем
-            window.location.href = deepLink;
+
+            if (!tg || !tg.initData) {
+                // Открыли не внутри Telegram — показываем предупреждение
+                document.getElementById('response-box').innerText =
+                    "⚠️ Откройте Mini App через кнопку в боте Telegram!";
+                return;
+            }
+
+            // Передаём данные боту. Максимум 4096 байт.
+            const payload = JSON.stringify({ text: text });
+            tg.sendData(payload);
+
+            document.getElementById('response-box').innerText =
+                "✅ Отправлено! Вернитесь в чат с ботом.";
         }
     </script>
 </body>
