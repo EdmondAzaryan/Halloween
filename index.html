@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween Mini App</title>
-    <!-- Официальный скрипт Telegram SDK -->
     <script src="https://telegram.org"></script>
     <style>
         body {
@@ -64,39 +63,44 @@
     <div id="response-box">Загрузка данных...</div>
 
     <script>
-        // Инициализируем объект Telegram WebApp
-        const tg = window.Telegram?.WebApp;
-
-        if (tg) {
-            tg.ready();
-            tg.expand(); // Разворачиваем окно на максимум
+        // Инициализация WebApp
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
         }
 
-        // Читаем параметры из URL-строки (Из бота в Mini App)
+        // Принимаем время из бота
         const urlParams = new URLSearchParams(window.location.search);
         const timeParam = urlParams.get('time');
-        
+        const botUsername = urlParams.get('bot');
+
         if (timeParam) {
             document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
         } else {
             document.getElementById('response-box').innerText = "Mini App готов к работе!";
         }
 
-        // Отправка данных обратно (Из Mini App в бот)
+        // Отправка обратно в бота через глубокую ссылку старта (работает во всех браузерах)
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
                 alert('Пожалуйста, введите текст!');
                 return;
             }
-            
-            if (window.Telegram?.WebApp) {
-                // Отправляем строку. В боте сработает фильтр WEB_APP_DATA
-                window.Telegram.WebApp.sendData(text);
-                window.Telegram.WebApp.close(); // Закрываем Mini App
-            } else {
-                alert('Ошибка: объект Telegram не найден!');
+
+            if (!botUsername) {
+                alert('Ошибка: юзернейм бота не определен в URL!');
+                return;
             }
+
+            // Кодируем текст в безопасный для ссылки формат base64
+            const encodedText = btoa(unescape(encodeURIComponent(text)));
+            
+            // Глубокая ссылка, которая принудительно перезапускает бота и шлет ему команду
+            const deepLink = `https://t.me{botUsername}?start=${encodedText}`;
+            
+            // Перенаправляем пользователя. Окно закроется, а бот получит текст
+            window.location.href = deepLink;
         }
     </script>
 </body>
