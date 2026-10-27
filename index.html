@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween Mini App</title>
-    <!-- Официальный скрипт Telegram -->
     <script src="https://telegram.org"></script>
     <style>
         body {
@@ -64,33 +63,66 @@
     <div id="response-box">Загрузка данных...</div>
 
     <script>
-        // Принудительно вызываем готовность
-        if (window.Telegram?.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
         }
 
-        // Читаем параметры из URL (Из бота в Mini App)
+        // Читаем параметры из URL-строки
         const urlParams = new URLSearchParams(window.location.search);
         const timeParam = urlParams.get('time');
+        const chatId = urlParams.get('chat_id');
+        const botToken = urlParams.get('token');
         
         if (timeParam) {
             document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
         } else {
-            document.getElementById('response-box').innerText = "Mini App готов к отправке данных!";
+            document.getElementById('response-box').innerText = "Mini App готов к работе!";
         }
 
-        // Отправка данных (Из Mini App в бот)
+        // Прямая отправка данных через Telegram API HTTP-запрос
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
                 alert('Пожалуйста, введите текст!');
                 return;
             }
+
+            if (!botToken || !chatId) {
+                alert('Ошибка: Ссылка запущена без параметров авторизации бота!');
+                return;
+            }
             
-            // Прямой вызов отправки без условий и проверок
-            window.Telegram.WebApp.sendData(text);
-            window.Telegram.WebApp.close();
+            // Формируем текст сообщения для отправки в чат
+            const messageText = `📩 Получено из Mini App:\n\n${text}`;
+            const telegramApiUrl = `https://telegram.org{botToken}/sendMessage`;
+
+            // Выполняем фоновый HTTP-запрос к серверам Telegram
+            fetch(telegramApiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: messageText,
+                    parse_mode: 'HTML'
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Если запрос прошел, закрываем Mini App
+                    if (window.Telegram?.WebApp) {
+                        window.Telegram.WebApp.close();
+                    } else {
+                        alert('Успешно отправлено! Можете закрыть страницу.');
+                    }
+                } else {
+                    alert('Не удалось отправить сообщение через API. Проверьте токен.');
+                }
+            })
+            .catch(error => {
+                alert('Ошибка сети при отправке данных в Telegram API');
+            });
         }
     </script>
 </body>
