@@ -62,10 +62,9 @@
     <div id="response-box">Загрузка данных...</div>
 
     <script>
-        // Извлекаем переданные ботом параметры из адресной строки
+        // Считываем время, переданное ботом из параметров ссылки
         const urlParams = new URLSearchParams(window.location.search);
         const timeParam = urlParams.get('time');
-        const botUsername = urlParams.get('bot');
 
         if (timeParam) {
             document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
@@ -73,25 +72,22 @@
             document.getElementById('response-box').innerText = "Mini App готов к работе!";
         }
 
-        // Чистая отправка данных через принудительный редирект (работает везде)
+        // Отправка данных обратно в чат
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
                 alert('Пожалуйста, введите текст!');
                 return;
             }
-
-            // Защита: если юзернейм не прилетел, шлем в универсальный адрес t.me/share
-            const targetBot = botUsername ? botUsername : "Bshshzj_bot";
             
-            // Превращаем текст в безопасную строку для ссылки
-            const cleanText = encodeURIComponent(text);
+            // Формируем текст, который пользователь отправит в чат бота
+            const messageText = encodeURIComponent(`🎃 Данные из Mini App:\n${text}`);
             
-            // Формируем глубокую ссылку, которая откроет вашего бота и передаст параметр старта
-            const redirectUrl = `https://t.me{targetBot}?start=${cleanText}`;
+            // Универсальная команда отправки текста, которая работает во всех встроенных браузерах Telegram
+            const shareUrl = `https://t.me{shareUrlText}`;
             
-            // Принудительно перенаправляем браузер
-            window.location.replace(redirectUrl);
+            // Перенаправляем браузер — откроется окно выбора чата, где верхним будет ваш бот
+            window.location.href = `https://t.me{messageText}`;
         }
     </script>
 </body>
