@@ -4,39 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween Mini App</title>
-    <!-- Подключаем скрипт Telegram -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: sans-serif;
-            background-color: #1a1a1a;
-            color: #fff;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
+            font-family: sans-serif; background-color: #1a1a1a; color: #fff;
+            padding: 20px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; height: 100vh; margin: 0;
         }
         input, button {
             width: 100%; max-width: 300px; padding: 12px;
-            font-size: 16px; border-radius: 8px; margin-bottom: 15px;
-            box-sizing: border-box;
+            font-size: 16px; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box;
         }
         input { background-color: #2b2b2b; color: #fff; border: 1px solid #ffaa00; }
-        button {
-            background-color: #ffaa00; color: #000; font-weight: bold;
-            border: none; cursor: pointer;
-        }
-        #status { color: #ffaa00; margin-top: 10px; font-size: 14px; text-align: center; }
+        button { background-color: #ffaa00; color: #000; font-weight: bold; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
     <h2>Halloween Mini App 🎃</h2>
     <input type="text" id="userInput" placeholder="Напишите текст..." />
     <button onclick="sendData()">Отправить в бота</button>
-    <div id="status"></div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -46,35 +32,18 @@
 
         function sendData() {
             const text = document.getElementById('userInput').value.trim();
-            if (!text) {
-                alert('Введите текст!');
-                return;
-            }
+            if (!text) { alert('Введите текст!'); return; }
 
-            // 1. Копируем текст в буфер обмена (на случай, если переход не сработает)
-            navigator.clipboard.writeText(text).catch(e => console.log("Буфер не сработал"));
-
-            document.getElementById('status').innerText = "Открываем бота...";
-
-            // 2. Формируем ссылку (пробелы меняем на _)
+            // Формируем ссылку
             const safeText = text.replace(/\s+/g, '_');
             const deepLink = "https://t.me/" + botUsername + "?start=" + encodeURIComponent(safeText);
 
-            // 3. Пытаемся закрыть Mini App и открыть ссылку
-            if (tg) {
-                try {
-                    // Закрываем окно Mini App, чтобы вернуться в чат
-                    tg.close();
-                    // Даем полсекунды на закрытие и открываем ссылку
-                    setTimeout(() => {
-                        window.location.href = deepLink;
-                    }, 500);
-                } catch (e) {
-                    // Если закрыть не удалось — просто переходим
-                    window.location.href = deepLink;
-                }
+            // Используем официальный метод Telegram для открытия ссылок
+            if (tg && tg.openTelegramLink) {
+                tg.openTelegramLink(deepLink);
+                // Закрываем текущее окно
+                setTimeout(() => { tg.close(); }, 300);
             } else {
-                // Если это обычный браузер
                 window.location.href = deepLink;
             }
         }
