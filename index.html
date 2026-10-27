@@ -3,19 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Mini App</title>
-    <!-- Официальный SDK Telegram -->
+    <title>Halloween Mini App</title>
+    <!-- Официальный актуальный скрипт Telegram SDK -->
     <script src="https://telegram.org"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+            background-color: var(--tg-theme-bg-color, #1a1a1a);
+            color: var(--tg-theme-text-color, #ffffff);
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
             gap: 15px;
+            box-sizing: border-box;
         }
         input, button {
             width: 100%;
@@ -23,12 +27,16 @@
             padding: 12px;
             font-size: 16px;
             border-radius: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid #ffaa00;
             box-sizing: border-box;
         }
+        input {
+            background-color: #2b2b2b;
+            color: #fff;
+        }
         button {
-            background-color: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
+            background-color: var(--tg-theme-button-color, #ffaa00);
+            color: var(--tg-theme-button-text-color, #000000);
             border: none;
             cursor: pointer;
             font-weight: bold;
@@ -37,55 +45,70 @@
             margin-top: 15px;
             padding: 15px;
             border-radius: 8px;
-            background: rgba(0,0,0,0.05);
+            background: rgba(255,255,255,0.1);
             width: 100%;
             max-width: 300px;
             word-break: break-word;
             text-align: center;
+            border: 1px dashed #ffaa00;
         }
     </style>
 </head>
 <body>
 
-    <h2>Mini App Работает!</h2>
+    <h2>Halloween Mini App 🎃</h2>
     
-    <input type="text" id="userInput" placeholder="Введите сообщение для бота..." />
+    <input type="text" id="userInput" placeholder="Напишите что-то боту..." />
     <button onclick="sendDataToBot()">Отправить в бота</button>
 
-    <div id="response-box">Ожидание данных...</div>
+    <div id="response-box">Загрузка данных из Telegram...</div>
 
     <script>
-        const tg = window.Telegram?.WebApp;
-        
-        if (tg) {
+        let tg = null;
+
+        function mainInit() {
+            tg = window.Telegram?.WebApp;
+
+            // Если Telegram еще не успел создать объект WebApp, пробуем снова через 50 миллисекунд
+            if (!tg || !tg.initData) {
+                setTimeout(mainInit, 50);
+                return;
+            }
+
+            // Telegram готов к работе
             tg.ready();
             tg.expand();
 
-            // Чтение параметров из URL-строки (Передача ИЗ БОТА в Mini App)
+            // ЧИТАЕМ ДАННЫЕ ИЗ БОТА (из параметров URL-ссылки)
             const urlParams = new URLSearchParams(window.location.search);
             const timeParam = urlParams.get('time');
 
             if (timeParam) {
-                document.getElementById('response-box').innerText = "Получено из бота: " + timeParam;
+                document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
             } else {
-                document.getElementById('response-box').innerText = "Параметры от бота не переданы.";
+                document.getElementById('response-box').innerText = "Бот ничего не передал в ссылку.";
             }
-        } else {
-            document.body.innerHTML = '<h3>Запустите приложение внутри Telegram!</h3>';
         }
 
-        // Функция отправки данных (ИЗ Mini App в бот)
+        // ОТПРАВЛЯЕМ ДАННЫЕ В БОТА
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
-                alert('Введите текст!');
+                alert('Пожалуйста, введите текст перед отправкой!');
                 return;
             }
             
-            // Отправляем данные. В боте сработает фильтр WEB_APP_DATA
-            tg.sendData(text);
-            tg.close();
+            if (tg) {
+                // Отправляет строку обратно в чат. Бот поймает её через filters.StatusUpdate.WEB_APP_DATA
+                tg.sendData(text);
+                tg.close(); // Закрываем Mini App после отправки
+            } else {
+                alert('Ошибка: объект Telegram не найден!');
+            }
         }
+
+        // Запуск при загрузке страницы
+        window.onload = mainInit;
     </script>
 </body>
 </html>
