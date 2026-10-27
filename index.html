@@ -62,10 +62,11 @@
     <div id="response-box">Загрузка данных...</div>
 
     <script>
-        // Читаем параметры из URL-строки (из бота в Mini App)
+        // Считываем параметры из URL-строки
         const urlParams = new URLSearchParams(window.location.search);
         const timeParam = urlParams.get('time');
-        const botUsername = urlParams.get('bot_username'); // получаем имя бота
+        const chatId = urlParams.get('chat_id');
+        const serverUrl = urlParams.get('server_url'); // Адрес нашего веб-сервера бота
         
         if (timeParam) {
             document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
@@ -73,7 +74,6 @@
             document.getElementById('response-box').innerText = "Mini App готов к работе!";
         }
 
-        // Пересылка данных через глубокую ссылку Telegram (работает ВСЕГДА)
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
@@ -81,19 +81,40 @@
                 return;
             }
 
-            if (!botUsername) {
-                alert('Ошибка: Ссылка запущена без имени бота!');
+            if (!chatId || !serverUrl) {
+                alert('Ошибка: Не переданы ID чата или адрес сервера!');
                 return;
             }
-            
-            // Формируем текст, который уйдет в чат
-            const messageText = encodeURIComponent(`🎃 Данные из Mini App:\n${text}`);
-            
-            // Глубокая ссылка, которая принудительно открывает чат с вашим ботом и вставляет туда текст
-            const telegramDeepLink = `tg://resolve?domain=${botUsername}&text=${messageText}`;
-            
-            // Выполняем редирект. Телефон сам закроет сайт и перекинет пользователя в чат бота
-            window.location.href = telegramDeepLink;
+
+            document.getElementById('response-box').innerText = "Отправка данных...";
+
+            // Отправляем обычный веб-запрос напрямую на бэкенд нашего бота
+            fetch(`${serverUrl}/api/data`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: text
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    document.getElementById('response-box').innerText = "Успешно отправлено! Можно закрыть окно.";
+                    // Если мы в Telegram, закрываем окно
+                    if (window.Telegram?.WebApp) {
+                        window.Telegram.WebApp.close();
+                    }
+                } else {
+                    alert('Сервер вернул ошибку: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Не удалось связаться с сервером бота. Проверьте запуск бота и Ngrok.');
+                document.getElementById('response-box').innerText = "Ошибка отправки.";
+            });
         }
     </script>
 </body>
