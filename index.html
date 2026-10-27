@@ -1,10 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween Mini App</title>
+    <!-- Подключаем скрипт Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: sans-serif;
@@ -28,7 +29,7 @@
             background-color: #ffaa00; color: #000; font-weight: bold;
             border: none; cursor: pointer;
         }
-        #status { color: #ffaa00; margin-top: 10px; font-size: 14px; }
+        #status { color: #ffaa00; margin-top: 10px; font-size: 14px; text-align: center; }
     </style>
 </head>
 <body>
@@ -38,7 +39,6 @@
     <div id="status"></div>
 
     <script>
-        // Достаем имя бота из ссылки
         const urlParams = new URLSearchParams(window.location.search);
         const botUsername = urlParams.get('bot') || "Bshshzj_bot";
         const tg = window.Telegram?.WebApp;
@@ -51,19 +51,30 @@
                 return;
             }
 
-            // Меняем пробелы на подчеркивания, чтобы ссылка не сломалась
-            const safeText = text.replace(/\s+/g, '_');
-
-            // Формируем обычную deep-link ссылку для бота
-            const deepLink = "https://t.me/" + botUsername + "?start=" + encodeURIComponent(safeText);
+            // 1. Копируем текст в буфер обмена (на случай, если переход не сработает)
+            navigator.clipboard.writeText(text).catch(e => console.log("Буфер не сработал"));
 
             document.getElementById('status').innerText = "Открываем бота...";
-            
-            // Пытаемся открыть ссылку через Telegram (если это Mini App)
-            if (tg && tg.openTelegramLink) {
-                tg.openTelegramLink(deepLink);
+
+            // 2. Формируем ссылку (пробелы меняем на _)
+            const safeText = text.replace(/\s+/g, '_');
+            const deepLink = "https://t.me/" + botUsername + "?start=" + encodeURIComponent(safeText);
+
+            // 3. Пытаемся закрыть Mini App и открыть ссылку
+            if (tg) {
+                try {
+                    // Закрываем окно Mini App, чтобы вернуться в чат
+                    tg.close();
+                    // Даем полсекунды на закрытие и открываем ссылку
+                    setTimeout(() => {
+                        window.location.href = deepLink;
+                    }, 500);
+                } catch (e) {
+                    // Если закрыть не удалось — просто переходим
+                    window.location.href = deepLink;
+                }
             } else {
-                // Если не сработало - открываем как обычную ссылку
+                // Если это обычный браузер
                 window.location.href = deepLink;
             }
         }
