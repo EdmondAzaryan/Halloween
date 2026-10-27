@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween Mini App</title>
+    <!-- Официальный скрипт Telegram (ОБЯЗАТЕЛЕН) -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -17,34 +18,41 @@
         }
         input { background-color: #2b2b2b; color: #fff; border: 1px solid #ffaa00; }
         button { background-color: #ffaa00; color: #000; font-weight: bold; border: none; cursor: pointer; }
+        #status { color: #ffaa00; margin-top: 10px; font-size: 14px; text-align: center; }
     </style>
 </head>
 <body>
     <h2>Halloween Mini App 🎃</h2>
     <input type="text" id="userInput" placeholder="Напишите текст..." />
     <button onclick="sendData()">Отправить в бота</button>
+    <div id="status"></div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const botUsername = urlParams.get('bot') || "Bshshzj_bot";
         const tg = window.Telegram?.WebApp;
-        if (tg) tg.ready();
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
 
         function sendData() {
             const text = document.getElementById('userInput').value.trim();
-            if (!text) { alert('Введите текст!'); return; }
+            if (!text) {
+                alert('Введите текст!');
+                return;
+            }
 
-            // Формируем ссылку
-            const safeText = text.replace(/\s+/g, '_');
-            const deepLink = "https://t.me/" + botUsername + "?start=" + encodeURIComponent(safeText);
+            // Если открыто не в Телеграме — выводим предупреждение
+            if (!tg || !tg.initData) {
+                document.getElementById('status').innerText = "⚠️ Откройте через бота в Telegram!";
+                return;
+            }
 
-            // Используем официальный метод Telegram для открытия ссылок
-            if (tg && tg.openTelegramLink) {
-                tg.openTelegramLink(deepLink);
-                // Закрываем текущее окно
-                setTimeout(() => { tg.close(); }, 300);
-            } else {
-                window.location.href = deepLink;
+            try {
+                document.getElementById('status').innerText = "Отправляем данные...";
+                // ОТПРАВЛЯЕМ ДАННЫЕ БОТУ (без ссылок и перезапусков)
+                tg.sendData(JSON.stringify({ text: text }));
+            } catch (e) {
+                document.getElementById('status').innerText = "Ошибка: " + e.message;
             }
         }
     </script>
