@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween Mini App</title>
-    <script src="https://telegram.org"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -63,13 +62,7 @@
     <div id="response-box">Загрузка данных...</div>
 
     <script>
-        // Инициализация WebApp
-        if (window.Telegram?.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
-        }
-
-        // Принимаем время из бота
+        // Извлекаем переданные ботом параметры из адресной строки
         const urlParams = new URLSearchParams(window.location.search);
         const timeParam = urlParams.get('time');
         const botUsername = urlParams.get('bot');
@@ -80,7 +73,7 @@
             document.getElementById('response-box').innerText = "Mini App готов к работе!";
         }
 
-        // Отправка обратно в бота через глубокую ссылку старта (работает во всех браузерах)
+        // Чистая отправка данных через принудительный редирект (работает везде)
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
@@ -88,19 +81,17 @@
                 return;
             }
 
-            if (!botUsername) {
-                alert('Ошибка: юзернейм бота не определен в URL!');
-                return;
-            }
-
-            // Кодируем текст в безопасный для ссылки формат base64
-            const encodedText = btoa(unescape(encodeURIComponent(text)));
+            // Защита: если юзернейм не прилетел, шлем в универсальный адрес t.me/share
+            const targetBot = botUsername ? botUsername : "Bshshzj_bot";
             
-            // Глубокая ссылка, которая принудительно перезапускает бота и шлет ему команду
-            const deepLink = `https://t.me{botUsername}?start=${encodedText}`;
+            // Превращаем текст в безопасную строку для ссылки
+            const cleanText = encodeURIComponent(text);
             
-            // Перенаправляем пользователя. Окно закроется, а бот получит текст
-            window.location.href = deepLink;
+            // Формируем глубокую ссылку, которая откроет вашего бота и передаст параметр старта
+            const redirectUrl = `https://t.me{targetBot}?start=${cleanText}`;
+            
+            // Принудительно перенаправляем браузер
+            window.location.replace(redirectUrl);
         }
     </script>
 </body>
