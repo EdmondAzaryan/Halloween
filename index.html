@@ -1,1 +1,95 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halloween Mini App</title>
+    <!-- ЭТА СТРОКА ОБЯЗАТЕЛЬНА, БЕЗ НЕЕ НИЧЕГО НЕ РАБОТАЕТ -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            gap: 15px;
+            box-sizing: border-box;
+        }
+        input, button {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ffaa00;
+            box-sizing: border-box;
+        }
+        input { background-color: #2b2b2b; color: #fff; }
+        button {
+            background-color: #ffaa00;
+            color: #000000;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #response-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            width: 100%;
+            max-width: 300px;
+            word-break: break-word;
+            text-align: center;
+            border: 1px dashed #ffaa00;
+        }
+    </style>
+</head>
+<body>
+    <h2>Halloween Mini App 🎃</h2>
+    <input type="text" id="userInput" placeholder="Напишите что-то боту..." />
+    <button onclick="sendDataToBot()">Отправить в бота</button>
+    <div id="response-box">Загрузка данных...</div>
+
+    <script>
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const timeParam = urlParams.get('time');
+
+        document.getElementById('response-box').innerText = timeParam
+            ? "Информация из бота: " + timeParam
+            : "Mini App готов к работе!";
+
+        function sendDataToBot() {
+            const text = document.getElementById('userInput').value.trim();
+            if (!text) {
+                alert('Пожалуйста, введите текст!');
+                return;
+            }
+
+            // Если открыто не в Telegram (например, в обычном браузере)
+            if (!tg || !tg.initData) {
+                document.getElementById('response-box').innerText =
+                    "⚠️ Откройте Mini App через кнопку в боте Telegram!";
+                return;
+            }
+
+            // ОТПРАВЛЯЕМ ДАННЫЕ НАПРЯМУЮ В БОТА (без всяких перезапусков и ссылок)
+            const payload = JSON.stringify({ text: text });
+            tg.sendData(payload);
+        }
+    </script>
+</body>
+</html>
