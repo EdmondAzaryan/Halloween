@@ -72,21 +72,21 @@
             document.getElementById('response-box').innerText = "Mini App готов к работе!";
         }
 
-        // Отправка данных обратно в чат
+        // Отправка данных обратно в чат бота
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
-                alert('Пожалуйста, введите text!');
+                alert('Пожалуйста, введите текст!');
                 return;
             }
             
-            // Формируем текст, который пользователь отправит в чат бота
+            // Формируем текст сообщения
             const messageText = encodeURIComponent(`🎃 Данные из Mini App:\n${text}`);
             
-            // Универсальная команда, которая работает во всех встроенных браузерах Telegram
+            // Самый надежный способ отправки текста обратно, который работает абсолютно везде
             const shareUrl = `https://t.me{messageText}`;
             
-            // Перенаправляем браузер — откроется окно выбора чата мессенджера
+            // Перенаправляем пользователя в окно Telegram для отправки сообщения
             window.location.href = shareUrl;
         }
     </script>
