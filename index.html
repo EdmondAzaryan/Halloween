@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween Mini App</title>
-    <!-- Официальный актуальный скрипт Telegram SDK -->
+    <!-- Подключаем скрипт Telegram -->
     <script src="https://telegram.org"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--tg-theme-bg-color, #1a1a1a);
-            color: var(--tg-theme-text-color, #ffffff);
+            background-color: #1a1a1a;
+            color: #ffffff;
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -35,8 +35,8 @@
             color: #fff;
         }
         button {
-            background-color: var(--tg-theme-button-color, #ffaa00);
-            color: var(--tg-theme-button-text-color, #000000);
+            background-color: #ffaa00;
+            color: #000000;
             border: none;
             cursor: pointer;
             font-weight: bold;
@@ -61,54 +61,53 @@
     <input type="text" id="userInput" placeholder="Напишите что-то боту..." />
     <button onclick="sendDataToBot()">Отправить в бота</button>
 
-    <div id="response-box">Загрузка данных из Telegram...</div>
+    <div id="response-box">Проверка Telegram...</div>
 
     <script>
-        let tg = null;
+        // Инициализируем сразу напрямую без циклов
+        const tg = window.Telegram?.WebApp;
 
-        function mainInit() {
-            tg = window.Telegram?.WebApp;
+        function checkTelegram() {
+            // Если объект есть и версия определена — мы внутри WebApp
+            if (tg && tg.version) {
+                tg.ready();
+                tg.expand();
 
-            // Если Telegram еще не успел создать объект WebApp, пробуем снова через 50 миллисекунд
-            if (!tg || !tg.initData) {
-                setTimeout(mainInit, 50);
-                return;
-            }
+                // Читаем параметры из URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const timeParam = urlParams.get('time');
 
-            // Telegram готов к работе
-            tg.ready();
-            tg.expand();
-
-            // ЧИТАЕМ ДАННЫЕ ИЗ БОТА (из параметров URL-ссылки)
-            const urlParams = new URLSearchParams(window.location.search);
-            const timeParam = urlParams.get('time');
-
-            if (timeParam) {
-                document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
+                if (timeParam) {
+                    document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
+                } else {
+                    document.getElementById('response-box').innerText = "WebApp готов. Бот не передал время.";
+                }
             } else {
-                document.getElementById('response-box').innerText = "Бот ничего не передал в ссылку.";
+                // Если tg не найден, выводим ошибку прямо в блок текста
+                document.getElementById('response-box').innerText = "Критическая ошибка: Запущено как обычный сайт, функции Telegram отключены!";
+                document.getElementById('response-box').style.borderColor = "red";
+                document.getElementById('response-box').style.color = "red";
             }
         }
 
-        // ОТПРАВЛЯЕМ ДАННЫЕ В БОТА
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
-                alert('Пожалуйста, введите текст перед отправкой!');
+                alert('Пожалуйста, введите текст!');
                 return;
             }
             
-            if (tg) {
-                // Отправляет строку обратно в чат. Бот поймает её через filters.StatusUpdate.WEB_APP_DATA
-                tg.sendData(text);
-                tg.close(); // Закрываем Mini App после отправки
+            // Проверяем объект перед отправкой напрямую
+            if (window.Telegram?.WebApp && window.Telegram.WebApp.version) {
+                window.Telegram.WebApp.sendData(text);
+                window.Telegram.WebApp.close();
             } else {
-                alert('Ошибка: объект Telegram не найден!');
+                alert('Ошибка: Невозможно отправить данные. Вы находитесь вне Telegram WebApp!');
             }
         }
 
-        // Запуск при загрузке страницы
-        window.onload = mainInit;
+        // Запуск проверки сразу при открытии страницы
+        window.onload = checkTelegram;
     </script>
 </body>
 </html>
