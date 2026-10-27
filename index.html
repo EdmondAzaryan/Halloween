@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween Mini App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: sans-serif;
@@ -28,14 +27,19 @@
             background-color: #ffaa00; color: #000; font-weight: bold;
             border: none; cursor: pointer;
         }
+        #status { color: #ffaa00; margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
     <h2>Halloween Mini App 🎃</h2>
-    <input type="text" id="userInput" placeholder="Напишите что-то боту..." />
+    <input type="text" id="userInput" placeholder="Напишите текст..." />
     <button onclick="sendData()">Отправить в бота</button>
+    <div id="status"></div>
 
     <script>
+        // Достаем имя бота из ссылки
+        const urlParams = new URLSearchParams(window.location.search);
+        const botUsername = urlParams.get('bot') || "Bshshzj_bot";
         const tg = window.Telegram?.WebApp;
         if (tg) tg.ready();
 
@@ -46,18 +50,21 @@
                 return;
             }
 
-            // Получаем имя бота из URL (которое передал Python)
-            const urlParams = new URLSearchParams(window.location.search);
-            const botUsername = urlParams.get('bot') || "Bshshzj_bot"; // Если нет - ставим твой
+            // Меняем пробелы на подчеркивания, чтобы ссылка не сломалась
+            const safeText = text.replace(/\s+/g, '_');
 
-            // Заменяем пробелы на _, так как Телеграм не любит пробелы в ссылках
-            const safeText = encodeURIComponent(text.replace(/\s+/g, '_'));
+            // Формируем обычную deep-link ссылку для бота
+            const deepLink = "https://t.me/" + botUsername + "?start=" + encodeURIComponent(safeText);
 
-            // Формируем ссылку. ВАЖНО: здесь используется startapp, а не start!
-            const deepLink = `https://t.me/${botUsername}?startapp=${safeText}`;
-
-            // Открываем Телеграм по этой ссылке (Mini App закроется, откроется чат с ботом)
-            window.location.href = deepLink;
+            document.getElementById('status').innerText = "Открываем бота...";
+            
+            // Пытаемся открыть ссылку через Telegram (если это Mini App)
+            if (tg && tg.openTelegramLink) {
+                tg.openTelegramLink(deepLink);
+            } else {
+                // Если не сработало - открываем как обычную ссылку
+                window.location.href = deepLink;
+            }
         }
     </script>
 </body>
