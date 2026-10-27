@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween Mini App</title>
+    <!-- Официальный скрипт Telegram SDK -->
+    <script src="https://telegram.org"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -62,11 +64,17 @@
     <div id="response-box">Загрузка данных...</div>
 
     <script>
-        // Считываем параметры из URL-строки
+        // Инициализируем объект Telegram WebApp
+        const tg = window.Telegram?.WebApp;
+
+        if (tg) {
+            tg.ready();
+            tg.expand(); // Разворачиваем окно на максимум
+        }
+
+        // Читаем параметры из URL-строки (Из бота в Mini App)
         const urlParams = new URLSearchParams(window.location.search);
         const timeParam = urlParams.get('time');
-        const chatId = urlParams.get('chat_id');
-        const serverUrl = urlParams.get('server_url'); // Адрес нашего веб-сервера бота
         
         if (timeParam) {
             document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
@@ -74,47 +82,21 @@
             document.getElementById('response-box').innerText = "Mini App готов к работе!";
         }
 
+        // Отправка данных обратно (Из Mini App в бот)
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
                 alert('Пожалуйста, введите текст!');
                 return;
             }
-
-            if (!chatId || !serverUrl) {
-                alert('Ошибка: Не переданы ID чата или адрес сервера!');
-                return;
+            
+            if (window.Telegram?.WebApp) {
+                // Отправляем строку. В боте сработает фильтр WEB_APP_DATA
+                window.Telegram.WebApp.sendData(text);
+                window.Telegram.WebApp.close(); // Закрываем Mini App
+            } else {
+                alert('Ошибка: объект Telegram не найден!');
             }
-
-            document.getElementById('response-box').innerText = "Отправка данных...";
-
-            // Отправляем обычный веб-запрос напрямую на бэкенд нашего бота
-            fetch(`${serverUrl}/api/data`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: text
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'ok') {
-                    document.getElementById('response-box').innerText = "Успешно отправлено! Можно закрыть окно.";
-                    // Если мы в Telegram, закрываем окно
-                    if (window.Telegram?.WebApp) {
-                        window.Telegram.WebApp.close();
-                    }
-                } else {
-                    alert('Сервер вернул ошибку: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert('Не удалось связаться с сервером бота. Проверьте запуск бота и Ngrok.');
-                document.getElementById('response-box').innerText = "Ошибка отправки.";
-            });
         }
     </script>
 </body>
