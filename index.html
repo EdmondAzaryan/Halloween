@@ -62,9 +62,9 @@
     <div id="response-box">Загрузка данных...</div>
 
     <script>
-        // Считываем время, переданное ботом из параметров ссылки
         const urlParams = new URLSearchParams(window.location.search);
         const timeParam = urlParams.get('time');
+        const botUsername = urlParams.get('bot'); // Забираем юзернейм бота, переданный сервером
 
         if (timeParam) {
             document.getElementById('response-box').innerText = "Информация из бота: " + timeParam;
@@ -72,7 +72,6 @@
             document.getElementById('response-box').innerText = "Mini App готов к работе!";
         }
 
-        // Отправка данных обратно в чат бота
         function sendDataToBot() {
             const text = document.getElementById('userInput').value;
             if (!text.trim()) {
@@ -80,14 +79,17 @@
                 return;
             }
             
-            // Формируем текст сообщения
-            const messageText = encodeURIComponent(`🎃 Данные из Mini App:\n${text}`);
+            // Если имя бота почему-то не прилетело, ставим твой юзернейм по умолчанию
+            const targetBot = botUsername ? botUsername : "Bshshzj_bot";
             
-            // Самый надежный способ отправки текста обратно, который работает абсолютно везде
-            const shareUrl = `https://t.me{messageText}`;
+            // Заменяем пробелы на нижнее подчеркивание, так как Telegram не любит пробелы в командах старта
+            const cleanText = encodeURIComponent(text.trim().replace(/\s+/g, '_'));
             
-            // Перенаправляем пользователя в окно Telegram для отправки сообщения
-            window.location.href = shareUrl;
+            // Глубокая ссылка, которая перезапустит твоего бота и передаст ему этот текст напрямую
+            const deepLink = "https://t.me" + targetBot + "?start=" + cleanText;
+            
+            // Перенаправляем
+            window.location.href = deepLink;
         }
     </script>
 </body>
