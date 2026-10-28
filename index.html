@@ -10,29 +10,25 @@
     
     <input type="text" id="userInput" placeholder="Напиши текст..." style="padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px;">
     
-    <button id="sendBtn" style="padding: 12px; width: 100%; background: #ffaa00; color: #000; font-weight: bold; border: none; border-radius: 5px; font-size: 16px;">
+    <a id="sendLink" style="display: block; text-align: center; padding: 12px; background: #ffaa00; color: #000; text-decoration: none; font-weight: bold; border-radius: 5px; font-size: 16px;">
         Отправить в бота
-    </button>
+    </a>
 
     <script>
-        document.getElementById('sendBtn').addEventListener('click', function() {
-            const text = document.getElementById('userInput').value.trim();
-            if (!text) {
-                alert('Введите текст!');
-                return;
-            }
+        const input = document.getElementById('userInput');
+        const link = document.getElementById('sendLink');
+        
+        // ТУТ ТЕПЕРЬ ПРАВИЛЬНЫЙ ЮЗЕРНЕЙМ
+        const botUsername = "Bzhshzjh_bot"; 
 
-            // Заменяем пробелы на _ для ссылки
-            const safeText = text.replace(/\s+/g, '_');
-            
-            // Твой юзернейм бота (БЕЗ @)
-            const botUsername = "Bshshzj_bot"; 
-            
-            // Формируем ссылку
-            const url = `https://t.me/${botUsername}?start=${safeText}`;
-            
-            // Переходим
-            window.location.href = url;
+        input.addEventListener('input', () => {
+            const text = input.value.trim();
+            if (text) {
+                const safeText = text.replace(/\s+/g, '_');
+                link.href = `https://t.me/${botUsername}?start=${encodeURIComponent(safeText)}`;
+            } else {
+                link.href = `https://t.me/${botUsername}`;
+            }
         });
     </script>
 </body>
