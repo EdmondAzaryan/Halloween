@@ -4,32 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body style="background: #1a1a1a; color: #fff; padding: 20px; font-family: sans-serif;">
     <h2>Halloween 🎃</h2>
-    
     <input type="text" id="userInput" placeholder="Напиши текст..." style="padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px;">
-    
-    <a id="sendLink" style="display: block; text-align: center; padding: 12px; background: #ffaa00; color: #000; text-decoration: none; font-weight: bold; border-radius: 5px; font-size: 16px;">
-        Отправить в бота
-    </a>
+    <button onclick="sendData()" style="padding: 12px; width: 100%; background: #ffaa00; color: #000; font-weight: bold; border: none; border-radius: 5px; font-size: 16px;">Отправить в бота</button>
 
     <script>
-        const input = document.getElementById('userInput');
-        const link = document.getElementById('sendLink');
-        
-        // ТУТ ТЕПЕРЬ ПРАВИЛЬНЫЙ ЮЗЕРНЕЙМ
-        const botUsername = "Bzhshzjh_bot"; 
+        const tg = window.Telegram.WebApp;
+        tg.ready();
 
-        input.addEventListener('input', () => {
-            const text = input.value.trim();
-            if (text) {
-                const safeText = text.replace(/\s+/g, '_');
-                link.href = `https://t.me/${botUsername}?start=${encodeURIComponent(safeText)}`;
-            } else {
-                link.href = `https://t.me/${botUsername}`;
+        function sendData() {
+            const text = document.getElementById('userInput').value.trim();
+            if (!text) {
+                alert('Введите текст!');
+                return;
             }
-        });
+
+            // ВОТ ГЛАВНЫЙ МОМЕНТ. Отправляем данные в бота через API Телеграма.
+            // Это не требует домена, ссылок и копирования.
+            tg.sendData(text);
+        }
     </script>
 </body>
 </html>
