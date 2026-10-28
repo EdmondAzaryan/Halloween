@@ -3,34 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <title>Halloween</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body style="background: #1a1a1a; color: #fff; padding: 20px; font-family: sans-serif;">
     <h2>Halloween 🎃</h2>
+    
     <input type="text" id="userInput" placeholder="Напиши текст..." style="padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px;">
     
-    <!-- Сюда мы вставим ссылку через JS -->
-    <a id="sendBtn" href="#" style="display: block; text-align: center; padding: 12px; background: #ffaa00; color: #000; text-decoration: none; font-weight: bold; border-radius: 5px;">
-        Отправить в бота
-    </a>
+    <button onclick="copyText()" style="padding: 12px; width: 100%; background: #ffaa00; color: #000; font-weight: bold; border: none; border-radius: 5px; font-size: 16px;">
+        Скопировать текст в буфер
+    </button>
 
     <script>
-        const input = document.getElementById('userInput');
-        const btn = document.getElementById('sendBtn');
-
-        // Имя твоего бота (БЕЗ @)
-        const botUsername = "Bzhshzjh_bot"; 
-
-        // Эта функция обновляет ссылку каждый раз, когда ты печатаешь
-        input.addEventListener('input', () => {
-            const text = input.value.trim();
-            if (text) {
-                // Заменяем пробелы на _
-                const safeText = text.replace(/\s+/g, '_');
-                btn.href = `https://t.me/${botUsername}?start=${encodeURIComponent(safeText)}`;
-            } else {
-                btn.href = `https://t.me/${botUsername}`;
+        function copyText() {
+            const text = document.getElementById('userInput').value.trim();
+            if (!text) {
+                alert('Сначала введи текст!');
+                return;
             }
-        });
+            
+            // Копируем текст в буфер обмена телефона
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Текст скопирован! Теперь закрой окно и вставь его в чат с ботом.');
+                
+                // Если открыто в Телеграме - закрываем окно
+                const tg = window.Telegram.WebApp;
+                if (tg && tg.close) tg.close();
+            }).catch(err => {
+                alert('Ошибка копирования. Попробуй выделить текст вручную.');
+            });
+        }
     </script>
 </body>
 </html>
