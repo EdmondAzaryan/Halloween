@@ -3,37 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Halloween</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body style="background: #1a1a1a; color: #fff; padding: 20px; font-family: sans-serif;">
-    <h2>Halloween Mini App 🎃</h2>
+    <h2>Halloween 🎃</h2>
     <input type="text" id="userInput" placeholder="Напиши текст..." style="padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px;">
-    <button onclick="sendData()" style="padding: 12px; width: 100%; background: #ffaa00; color: #000; font-weight: bold; border: none; border-radius: 5px;">Отправить в бота</button>
+    
+    <!-- Сюда мы вставим ссылку через JS -->
+    <a id="sendBtn" href="#" style="display: block; text-align: center; padding: 12px; background: #ffaa00; color: #000; text-decoration: none; font-weight: bold; border-radius: 5px;">
+        Отправить в бота
+    </a>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready();
+        const input = document.getElementById('userInput');
+        const btn = document.getElementById('sendBtn');
 
-        function sendData() {
-            const text = document.getElementById('userInput').value.trim();
-            if (!text) { alert('Введите текст!'); return; }
+        // Имя твоего бота (БЕЗ @)
+        const botUsername = "Bzhshzjh_bot"; 
 
-            // Берем имя бота из ссылки (в коде бота мы его передадим)
-            const botUsername = new URLSearchParams(window.location.search).get('bot') || "Bzhshzjh_bot"; // Проверь юзернейм!
-            
-            // Меняем пробелы на _ для ссылки
-            const safeText = text.replace(/\s+/g, '_');
-            
-            const deepLink = `https://t.me/${botUsername}?start=${safeText}`;
-            
-            // Открываем ссылку внутри Телеграма
-            if (tg && tg.openTelegramLink) {
-                tg.openTelegramLink(deepLink);
-                tg.close(); // Закрываем окно
+        // Эта функция обновляет ссылку каждый раз, когда ты печатаешь
+        input.addEventListener('input', () => {
+            const text = input.value.trim();
+            if (text) {
+                // Заменяем пробелы на _
+                const safeText = text.replace(/\s+/g, '_');
+                btn.href = `https://t.me/${botUsername}?start=${encodeURIComponent(safeText)}`;
             } else {
-                window.location.href = deepLink;
+                btn.href = `https://t.me/${botUsername}`;
             }
-        }
+        });
     </script>
 </body>
 </html>
