@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body style="background: #1a1a1a; color: #fff; padding: 20px; font-family: sans-serif;">
     <h2>Halloween 🎃</h2>
@@ -19,13 +18,13 @@
                 return;
             }
 
-            // Меняем пробелы на _, чтобы ссылка не ломалась
+            // Твой точный юзернейм (без @)
+            const botUsername = "Jdfjjfjbot"; 
+            
+            // Меняем пробелы на _
             const safeText = text.replace(/\s+/g, '_');
             
-            // Имя твоего НОВОГО бота (testbot)
-            const botUsername = "testbot"; 
-            
-            // Формируем ссылку
+            // Ссылка
             const url = `https://t.me/${botUsername}?start=${encodeURIComponent(safeText)}`;
             
             // Переходим
