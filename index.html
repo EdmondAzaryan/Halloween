@@ -2,20 +2,13 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halloween Mini App</title>
+    <title>Halloween</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: #fff; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        input, button { width: 100%; max-width: 300px; padding: 12px; font-size: 16px; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
-        input { background-color: #2b2b2b; color: #fff; border: 1px solid #ffaa00; }
-        button { background-color: #ffaa00; color: #000; font-weight: bold; border: none; cursor: pointer; }
-    </style>
 </head>
-<body>
+<body style="background: #1a1a1a; color: #fff; padding: 20px; font-family: sans-serif;">
     <h2>Halloween Mini App 🎃</h2>
-    <input type="text" id="userInput" placeholder="Напиши текст..." />
-    <button onclick="sendData()">Отправить в бота</button>
+    <input type="text" id="userInput" placeholder="Напиши текст..." style="padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px;">
+    <button onclick="sendData()" style="padding: 12px; width: 100%; background: #ffaa00; color: #000; font-weight: bold; border: none; border-radius: 5px;">Отправить в бота</button>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -23,12 +16,23 @@
 
         function sendData() {
             const text = document.getElementById('userInput').value.trim();
-            if (!text) {
-                alert('Введите текст!');
-                return;
+            if (!text) { alert('Введите текст!'); return; }
+
+            // Берем имя бота из ссылки (в коде бота мы его передадим)
+            const botUsername = new URLSearchParams(window.location.search).get('bot') || "Bzhshzjh_bot"; // Проверь юзернейм!
+            
+            // Меняем пробелы на _ для ссылки
+            const safeText = text.replace(/\s+/g, '_');
+            
+            const deepLink = `https://t.me/${botUsername}?start=${safeText}`;
+            
+            // Открываем ссылку внутри Телеграма
+            if (tg && tg.openTelegramLink) {
+                tg.openTelegramLink(deepLink);
+                tg.close(); // Закрываем окно
+            } else {
+                window.location.href = deepLink;
             }
-            // Отправляем данные боту
-            tg.sendData(JSON.stringify({ text: text }));
         }
     </script>
 </body>
