@@ -8,23 +8,53 @@
 </head>
 <body style="background: #1a1a1a; color: #fff; padding: 20px; font-family: sans-serif;">
     <h2>Halloween 🎃</h2>
+    
     <input type="text" id="userInput" placeholder="Напиши текст..." style="padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px;">
-    <button onclick="sendData()" style="padding: 12px; width: 100%; background: #ffaa00; color: #000; font-weight: bold; border: none; border-radius: 5px; font-size: 16px;">Отправить в бота</button>
+    
+    <button onclick="sendMessage()" style="padding: 12px; width: 100%; background: #ffaa00; color: #000; font-weight: bold; border: none; border-radius: 5px; font-size: 16px;">
+        Отправить в бота
+    </button>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
 
-        function sendData() {
+        // СЮДА ВСТАВЬ ТОКЕН СВОЕГО НОВОГО БОТА
+        const BOT_TOKEN = "ТВОЙ_НОВЫЙ_ТОКЕН_ЗДЕСЬ"; 
+        
+        function sendMessage() {
             const text = document.getElementById('userInput').value.trim();
             if (!text) {
                 alert('Введите текст!');
                 return;
             }
 
-            // ВОТ ГЛАВНЫЙ МОМЕНТ. Отправляем данные в бота через API Телеграма.
-            // Это не требует домена, ссылок и копирования.
-            tg.sendData(text);
+            // Получаем ID пользователя из Telegram
+            const userId = tg.initDataUnsafe?.user?.id || 123456789;
+
+            // Отправляем запрос напрямую в API Telegram (обходит все блокировки Mini App)
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: userId,
+                    text: `📥 Ты написал: ${text}`
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    alert('✅ Сообщение отправлено в чат!');
+                    tg.close();
+                } else {
+                    alert('Ошибка: ' + data.description);
+                }
+            })
+            .catch(error => {
+                alert('Ошибка сети: ' + error.message);
+            });
         }
     </script>
 </body>
