@@ -2,64 +2,300 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini App Двусторонняя связь</title>
-    <!-- Подключаем SDK Telegram WebApp -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>2048 Telegram Game</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        /* ... (ТВОИ СТИЛИ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ, я добавил только стили для модального окна) ... */
+        body { font-family: Arial, sans-serif; background-color: #faf8ef; color: #776e65; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        /* Модальное окно для топа */
+        #leaderboard-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center;
         }
-        input, button {
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 16px;
+        .modal-content {
+            background: #faf8ef; padding: 20px; border-radius: 10px; width: 80%; max-width: 350px;
+            text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        button {
-            background-color: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            cursor: pointer;
-        }
+        .modal-content h3 { margin-top: 0; color: #776e65; }
+        .modal-content ul { list-style: none; padding: 0; margin: 15px 0; max-height: 200px; overflow-y: auto; }
+        .modal-content li { padding: 8px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; font-weight: bold; }
+        .modal-btn { background: #8f7a66; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+
+        /* ... (Остальные стили без изменений) ... */
+        #menu-screen-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #faf8ef; z-index: 9999; display: flex; flex-direction: column; align-items: center; padding-top: 60px; box-sizing: border-box; }
+        .menu-btn-settings { position: absolute; top: 15px; left: 0; background-color: #f0925c; color: white; border: none; border-radius: 0 8px 8px 0; padding: 10px 15px; font-size: 24px; cursor: pointer; }
+        .menu-title-text { color: #776e65; font-size: 42px; font-weight: 900; margin-bottom: 40px; letter-spacing: 2px; }
+        .menu-btn-base { width: 280px; border: none; border-radius: 6px; color: white; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; cursor: pointer; transition: transform 0.1s; }
+        .menu-btn-base:active { transform: scale(0.97); }
+        .btn-ads { background-color: #ea5e6a; margin-bottom: 50px; }
+        .btn-cont { background-color: #e88f5d; margin-bottom: 15px; }
+        .btn-rest { background-color: #cd6a3d; width: 250px; }
+        .menu-subtitle { color: #a39b92; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+        .menu-split-container { display: flex; width: 320px; height: 65px; margin-bottom: 50px; }
+        .split-left { flex: 0 0 calc(50% + 14px); background-color: #a05ef8; border: none; color: white; font-weight: bold; font-size: 20px; clip-path: polygon(0 0, 100% 0, calc(100% - 28px) 100%, 0 100%); border-radius: 6px 0 0 6px; padding-right: 20px; cursor: pointer; }
+        .split-right { flex: 0 0 calc(50% + 14px); background-color: #61a0f8; border: none; color: white; font-weight: bold; font-size: 14px; margin-left: -24px; clip-path: polygon(28px 0, 100% 0, 100% 100%, 0 100%); border-radius: 0 6px 6px 0; padding-left: 20px; cursor: pointer; }
+        .split-left:active, .split-right:active { opacity: 0.8; }
+        .header { width: 320px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .header-left { display: flex; flex-direction: column; gap: 5px; }
+        .btn-back-menu { background: #8f7a66; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .score-container { display: flex; gap: 10px; }
+        .score-box { background: #bbada0; color: white; padding: 5px 12px; border-radius: 5px; text-align: center; font-size: 13px; font-weight: bold; min-width: 60px; }
+        .score-box span { display: block; font-size: 18px; }
+        #game-container { width: 320px; height: 320px; background-color: #bbada0; border-radius: 6px; position: relative; padding: 8px; box-sizing: border-box; }
+        .grid-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .grid-row:last-child { margin-bottom: 0; }
+        .grid-cell { width: 68px; height: 68px; background: rgba(238, 228, 218, 0.35); border-radius: 4px; }
+        .tile { width: 68px; height: 68px; border-radius: 4px; position: absolute; display: flex; justify-content: center; align-items: center; font-size: 26px; font-weight: bold; transition: all 0.08s ease; z-index: 10; }
+        .tile-2 { background: #eee4da; color: #776e65; } .tile-4 { background: #ede0c8; color: #776e65; } .tile-8 { background: #f2b179; color: #f9f6f2; } .tile-16 { background: #f59563; color: #f9f6f2; } .tile-32 { background: #f67c5f; color: #f9f6f2; } .tile-64 { background: #f65e3b; color: #f9f6f2; } .tile-128 { background: #edcf72; color: #f9f6f2; font-size: 22px; } .tile-256 { background: #edcc61; color: #f9f6f2; font-size: 22px; } .tile-512 { background: #edc850; color: #f9f6f2; font-size: 22px; } .tile-1024 { background: #edc53f; color: #f9f6f2; font-size: 18px; } .tile-2048 { background: #edc22e; color: #f9f6f2; font-size: 18px; }
     </style>
 </head>
 <body>
-    <h2>Форма обратной связи</h2>
-    
-    <label for="userMsg">Введите сообщение для бота:</label>
-    <input type="text" id="userMsg" placeholder="Напишите что-то...">
 
-    <!-- Вариант 1: Отправка через sendData -->
-    <button onclick="sendDataToBot()">Отправить в бот (sendData)</button>
+    <!-- ОКНО ТОПА ИГРОКОВ -->
+    <div id="leaderboard-modal">
+        <div class="modal-content">
+            <h3>🏆 ТОП-10 ИГРОКОВ</h3>
+            <ul id="leaderboard-list">
+                <li>Загрузка...</li>
+            </ul>
+            <button class="modal-btn" onclick="closeLeaderboard()">Закрыть</button>
+        </div>
+    </div>
+
+    <div id="menu-screen-overlay">
+        <button class="menu-btn-settings" onclick="alert('Настройки')">⚙</button>
+        <div class="menu-title-text">МЕНЮ</div>
+        <button class="menu-btn-base btn-ads" onclick="alert('Без рекламы')">🚫 БЕЗ РЕКЛАМЫ</button>
+        <div class="menu-subtitle">Другие режимы игры</div>
+        <div class="menu-split-container">
+            <button class="split-left" onclick="alert('Вызовы')">ВЫЗОВЫ</button>
+            <button class="split-right" onclick="alert('Мультиплеер')">МУЛЬТИПЛЕЕР<br>VS</button>
+        </div>
+        
+        <!-- КНОПКА ТОПА -->
+        <button class="menu-btn-base" style="background-color: #e0c230; margin-bottom: 15px;" onclick="openLeaderboard()">
+            🏆 ТАБЛИЦА ЛИДЕРОВ
+        </button>
+
+        <button class="menu-btn-base btn-cont" onclick="hideMenuAndPlay()">ПРОДОЛЖИТЬ ▶</button>
+        <button class="menu-btn-base btn-rest" onclick="restartFromMenu()">↻ ПЕРЕЗАПУСТИТЬ</button>
+    </div>
+
+    <div class="header">
+        <div class="header-left">
+            <h2 style="margin:0;">2048</h2>
+            <button class="btn-back-menu" onclick="showMenu()">В МЕНЮ</button>
+        </div>
+        <div class="score-container">
+            <div class="score-box">СЧЕТ<span id="score">0</span></div>
+            <div class="score-box">РЕКОРД<span id="best-score">0</span></div>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <div class="grid-row"><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div></div>
+        <div class="grid-row"><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div></div>
+        <div class="grid-row"><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div></div>
+        <div class="grid-row"><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div></div>
+        <div id="tiles-container"></div>
+    </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Разворачиваем на весь экран
-
-        // Вариант 1: Отправка данных обратно в чат через sendData
-        function sendDataToBot() {
-            const text = document.getElementById('userMsg').value;
-            if (!text) {
-                tg.showAlert('Пожалуйста, введите текст!');
-                return;
-            }
-
-            const payload = {
-                action: 'feedback',
-                message: text,
-                timestamp: Date.now()
-            };
-
-            // Передаем данные боту (закроет Web App)
-            tg.sendData(JSON.stringify(payload));
+        // --- Инициализация Telegram ---
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            if(tg.expand) tg.expand();
         }
+        const userId = tg?.initDataUnsafe?.user?.id || 12345;
+        const userName = tg?.initDataUnsafe?.user?.first_name || "Игрок";
+        
+        // ВНИМАНИЕ: Если будешь тестировать на компе, замени localhost на IP или хостинг
+        const SERVER_URL = "http://localhost:8000"; 
+
+        let board = Array(4).fill().map(() => Array(4).fill(0));
+        let score = 0;
+        let bestScore = 0;
+
+        // --- Загрузка прогресса из облака ---
+        if (tg && tg.CloudStorage) {
+            tg.CloudStorage.getItem('best_score_2048', (err, value) => {
+                if (!err && value) {
+                    bestScore = parseInt(value, 10);
+                    document.getElementById('best-score').innerText = bestScore;
+                }
+            });
+            // Можно также загружать сохраненную сетку (board)
+        }
+
+        // --- Логика Меню ---
+        function hideMenuAndPlay() { document.getElementById('menu-screen-overlay').style.display = 'none'; }
+        function showMenu() { document.getElementById('menu-screen-overlay').style.display = 'flex'; }
+        function restartFromMenu() {
+            if(confirm("Начать новую игру? Текущий счет сбросится.")) {
+                initGame();
+                hideMenuAndPlay();
+            }
+        }
+
+        // --- Таблица лидеров ---
+        async function openLeaderboard() {
+            document.getElementById('leaderboard-modal').style.display = 'flex';
+            const list = document.getElementById('leaderboard-list');
+            list.innerHTML = '<li>Загрузка...</li>';
+            
+            try {
+                const response = await fetch(`${SERVER_URL}/top`);
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    list.innerHTML = '<li>Пока нет рекордов</li>';
+                } else {
+                    list.innerHTML = data.map((p, i) => `<li><span>${i+1}. ${p.name}</span> <span>${p.score}</span></li>`).join('');
+                }
+            } catch (e) {
+                list.innerHTML = '<li>Ошибка сети</li>';
+            }
+        }
+        function closeLeaderboard() { document.getElementById('leaderboard-modal').style.display = 'none'; }
+
+        // --- Игра ---
+        function initGame() {
+            board = Array(4).fill().map(() => Array(4).fill(0));
+            score = 0;
+            document.getElementById('score').innerText = 0;
+            addTile();
+            addTile();
+            drawBoard();
+        }
+
+        function addTile() {
+            let emptyCells = [];
+            for(let r=0; r<4; r++) {
+                for(let c=0; c<4; c++) {
+                    if(board[r][c] === 0) emptyCells.push({r, c});
+                }
+            }
+            if(emptyCells.length > 0) {
+                let cell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                board[cell.r][cell.c] = Math.random() < 0.9 ? 2 : 4;
+            }
+        }
+
+        function drawBoard() {
+            const container = document.getElementById('tiles-container');
+            container.innerHTML = '';
+            for(let r=0; r<4; r++) {
+                for(let c=0; c<4; c++) {
+                    if(board[r][c] !== 0) {
+                        let tile = document.createElement('div');
+                        tile.className = `tile tile-${board[r][c]}`;
+                        tile.innerText = board[r][c];
+                        tile.style.top = `${8 + r * 76}px`;
+                        tile.style.left = `${8 + c * 76}px`;
+                        container.appendChild(tile);
+                    }
+                }
+            }
+        }
+
+        function updateScore(amount) {
+            score += amount;
+            document.getElementById('score').innerText = score;
+            if (score > bestScore) {
+                bestScore = score;
+                document.getElementById('best-score').innerText = bestScore;
+                
+                // Сохраняем в облако Телеграма
+                if (tg && tg.CloudStorage) {
+                    tg.CloudStorage.setItem('best_score_2048', String(bestScore));
+                }
+
+                // Отправляем на сервер
+                fetch(`${SERVER_URL}/save_score`, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json" }, 
+                    body: JSON.stringify({ user_id: userId, name: userName, score: bestScore }) 
+                }).catch(e => console.log("Ошибка сохранения на сервер"));
+            }
+        }
+
+        function slide(row) {
+            let arr = row.filter(val => val);
+            for (let i = 0; i < arr.length - 1; i++) {
+                if (arr[i] === arr[i + 1]) { arr[i] *= 2; updateScore(arr[i]); arr[i + 1] = 0; }
+            }
+            arr = arr.filter(val => val);
+            while (arr.length < 4) arr.push(0);
+            return arr;
+        }
+
+        function move(direction) {
+            let oldBoard = JSON.stringify(board);
+            if (direction === 'left' || direction === 'right') {
+                for (let i = 0; i < 4; i++) {
+                    let row = [...board[i]];
+                    if (direction === 'right') row.reverse();
+                    let newRow = slide(row);
+                    if (direction === 'right') newRow.reverse();
+                    board[i] = newRow;
+                }
+            } else if (direction === 'up' || direction === 'down') {
+                for (let c = 0; c < 4; c++) {
+                    let col = [board[0][c], board[1][c], board[2][c], board[3][c]];
+                    if (direction === 'down') col.reverse();
+                    let newCol = slide(col);
+                    if (direction === 'down') newCol.reverse();
+                    for (let r = 0; r < 4; r++) board[r][c] = newCol[r];
+                }
+            }
+            if (oldBoard !== JSON.stringify(board)) {
+                addTile();
+                drawBoard();
+                checkGameOver();
+            }
+        }
+
+        function checkGameOver() {
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 4; c++) {
+                    if (board[r][c] === 0) return;
+                    if (r < 3 && board[r][c] === board[r + 1][c]) return;
+                    if (c < 3 && board[r][c] === board[r][c + 1]) return;
+                }
+            }
+            if(tg && tg.showAlert) tg.showAlert(`Игра окончена! Счет: ${score}`);
+            else alert(`Игра окончена! Счет: ${score}`);
+            showMenu();
+            initGame();
+        }
+
+        // --- Свайпы ---
+        let startX = 0, startY = 0;
+        window.addEventListener('touchstart', (e) => {
+            if (document.getElementById('menu-screen-overlay').style.display !== 'none') return;
+            startX = e.changedTouches[0].clientX;
+            startY = e.changedTouches[0].clientY;
+        }, { passive: true });
+
+        window.addEventListener('touchend', (e) => {
+            if (document.getElementById('menu-screen-overlay').style.display !== 'none') return;
+            if (!startX || !startY) return;
+            let endX = e.changedTouches[0].clientX;
+            let endY = e.changedTouches[0].clientY;
+            let diffX = endX - startX;
+            let diffY = endY - startY;
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > 30) move(diffX > 0 ? 'right' : 'left');
+            } else {
+                if (Math.abs(diffY) > 30) move(diffY > 0 ? 'down' : 'up');
+            }
+            startX = 0; startY = 0;
+        }, { passive: true });
+
+        initGame();
     </script>
 </body>
 </html>
