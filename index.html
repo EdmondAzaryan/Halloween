@@ -2,44 +2,34 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Halloween</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halloween Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: #fff; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        input, button { width: 100%; max-width: 300px; padding: 12px; font-size: 16px; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
+        input { background-color: #2b2b2b; color: #fff; border: 1px solid #ffaa00; }
+        button { background-color: #ffaa00; color: #000; font-weight: bold; border: none; cursor: pointer; }
+    </style>
 </head>
-<body style="background: #1a1a1a; color: #fff; padding: 20px; font-family: sans-serif;">
+<body>
     <h2>Halloween Mini App 🎃</h2>
-    <input type="text" id="userInput" placeholder="Напиши текст..." style="padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px; border-radius: 5px; border: none;">
-    
-    <!-- Кнопка будет ссылкой, которую Telegram не заблокирует -->
-    <a id="sendLink" style="display: block; text-align: center; padding: 12px; background: #ffaa00; color: #000; text-decoration: none; font-weight: bold; border-radius: 5px;">
-        Отправить в бота
-    </a>
+    <input type="text" id="userInput" placeholder="Напиши текст..." />
+    <button onclick="sendData()">Отправить в бота</button>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
 
-        const input = document.getElementById('userInput');
-        const sendLink = document.getElementById('sendLink');
-        
-        // Имя бота, которое мы передали в ссылке
-        const botUsername = new URLSearchParams(window.location.search).get('bot') || "Bshshzj_bot";
-
-        function updateLink() {
-            const text = input.value.trim();
-            if (text) {
-                // Меняем пробелы на подчеркивания, чтобы ссылка не ломалась
-                const safeText = text.replace(/\s+/g, '_');
-                sendLink.href = `https://t.me/${botUsername}?start=${encodeURIComponent(safeText)}`;
-            } else {
-                sendLink.href = `https://t.me/${botUsername}`;
+        function sendData() {
+            const text = document.getElementById('userInput').value.trim();
+            if (!text) {
+                alert('Введите текст!');
+                return;
             }
+            // Отправляем данные боту
+            tg.sendData(JSON.stringify({ text: text }));
         }
-
-        // Обновляем ссылку каждый раз, когда ты печатаешь
-        input.addEventListener('input', updateLink);
-        
-        // Начальная установка ссылки
-        updateLink();
     </script>
 </body>
 </html>
