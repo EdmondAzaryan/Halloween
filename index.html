@@ -5,22 +5,41 @@
     <title>Halloween</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-<body style="background: #1a1a1a; color: #fff; padding: 20px;">
+<body style="background: #1a1a1a; color: #fff; padding: 20px; font-family: sans-serif;">
     <h2>Halloween Mini App 🎃</h2>
-    <input type="text" id="userInput" placeholder="Напиши текст..." style="padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px;">
-    <button id="sendBtn" style="padding: 10px; width: 100%; background: #ffaa00; color: #000; font-weight: bold; border: none;">Отправить в бота</button>
+    <input type="text" id="userInput" placeholder="Напиши текст..." style="padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px; border-radius: 5px; border: none;">
+    
+    <!-- Кнопка будет ссылкой, которую Telegram не заблокирует -->
+    <a id="sendLink" style="display: block; text-align: center; padding: 12px; background: #ffaa00; color: #000; text-decoration: none; font-weight: bold; border-radius: 5px;">
+        Отправить в бота
+    </a>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
 
-        document.getElementById('sendBtn').addEventListener('click', () => {
-            const text = document.getElementById('userInput').value;
+        const input = document.getElementById('userInput');
+        const sendLink = document.getElementById('sendLink');
+        
+        // Имя бота, которое мы передали в ссылке
+        const botUsername = new URLSearchParams(window.location.search).get('bot') || "Bshshzj_bot";
+
+        function updateLink() {
+            const text = input.value.trim();
             if (text) {
-                tg.sendData(JSON.stringify({ text: text }));
-                tg.close();
+                // Меняем пробелы на подчеркивания, чтобы ссылка не ломалась
+                const safeText = text.replace(/\s+/g, '_');
+                sendLink.href = `https://t.me/${botUsername}?start=${encodeURIComponent(safeText)}`;
+            } else {
+                sendLink.href = `https://t.me/${botUsername}`;
             }
-        });
+        }
+
+        // Обновляем ссылку каждый раз, когда ты печатаешь
+        input.addEventListener('input', updateLink);
+        
+        // Начальная установка ссылки
+        updateLink();
     </script>
 </body>
 </html>
