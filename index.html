@@ -1,34 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halloween</title>
+    <title>Mini App Двусторонняя связь</title>
+    <!-- Подключаем SDK Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        input, button {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body style="background: #1a1a1a; color: #fff; padding: 20px; font-family: sans-serif;">
-    <h2>Halloween 🎃</h2>
-    <input type="text" id="userInput" placeholder="Напиши текст..." style="padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px;">
-    <button onclick="sendData()" style="padding: 12px; width: 100%; background: #ffaa00; color: #000; font-weight: bold; border: none; border-radius: 5px; font-size: 16px;">Отправить в бота</button>
+<body>
+    <h2>Форма обратной связи</h2>
+    
+    <label for="userMsg">Введите сообщение для бота:</label>
+    <input type="text" id="userMsg" placeholder="Напишите что-то...">
+
+    <!-- Вариант 1: Отправка через sendData -->
+    <button onclick="sendDataToBot()">Отправить в бот (sendData)</button>
 
     <script>
-        function sendData() {
-            const text = document.getElementById('userInput').value.trim();
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Разворачиваем на весь экран
+
+        // Вариант 1: Отправка данных обратно в чат через sendData
+        function sendDataToBot() {
+            const text = document.getElementById('userMsg').value;
             if (!text) {
-                alert('Введите текст!');
+                tg.showAlert('Пожалуйста, введите текст!');
                 return;
             }
 
-            // Твой точный юзернейм (без @)
-            const botUsername = "Jdfjjfjbot"; 
-            
-            // Меняем пробелы на _
-            const safeText = text.replace(/\s+/g, '_');
-            
-            // Ссылка
-            const url = `https://t.me/${botUsername}?start=${encodeURIComponent(safeText)}`;
-            
-            // Переходим
-            window.location.href = url;
+            const payload = {
+                action: 'feedback',
+                message: text,
+                timestamp: Date.now()
+            };
+
+            // Передаем данные боту (закроет Web App)
+            tg.sendData(JSON.stringify(payload));
         }
     </script>
 </body>
