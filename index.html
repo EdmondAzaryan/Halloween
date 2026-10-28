@@ -2,37 +2,38 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halloween</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body style="background: #1a1a1a; color: #fff; padding: 20px; font-family: sans-serif;">
     <h2>Halloween 🎃</h2>
     
     <input type="text" id="userInput" placeholder="Напиши текст..." style="padding: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px;">
     
-    <button onclick="copyText()" style="padding: 12px; width: 100%; background: #ffaa00; color: #000; font-weight: bold; border: none; border-radius: 5px; font-size: 16px;">
-        Скопировать текст в буфер
+    <button id="sendBtn" style="padding: 12px; width: 100%; background: #ffaa00; color: #000; font-weight: bold; border: none; border-radius: 5px; font-size: 16px;">
+        Отправить в бота
     </button>
 
     <script>
-        function copyText() {
+        document.getElementById('sendBtn').addEventListener('click', function() {
             const text = document.getElementById('userInput').value.trim();
             if (!text) {
-                alert('Сначала введи текст!');
+                alert('Введите текст!');
                 return;
             }
+
+            // Заменяем пробелы на _ для ссылки
+            const safeText = text.replace(/\s+/g, '_');
             
-            // Копируем текст в буфер обмена телефона
-            navigator.clipboard.writeText(text).then(() => {
-                alert('✅ Текст скопирован! Теперь закрой окно и вставь его в чат с ботом.');
-                
-                // Если открыто в Телеграме - закрываем окно
-                const tg = window.Telegram.WebApp;
-                if (tg && tg.close) tg.close();
-            }).catch(err => {
-                alert('Ошибка копирования. Попробуй выделить текст вручную.');
-            });
-        }
+            // Твой юзернейм бота (БЕЗ @)
+            const botUsername = "Bshshzj_bot"; 
+            
+            // Формируем ссылку
+            const url = `https://t.me/${botUsername}?start=${safeText}`;
+            
+            // Переходим
+            window.location.href = url;
+        });
     </script>
 </body>
 </html>
