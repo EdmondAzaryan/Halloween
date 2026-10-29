@@ -125,7 +125,7 @@
         const userId = parseInt(urlParams.get('uid')) || tg?.initDataUnsafe?.user?.id || 12345;
         const userName = urlParams.get('name') || tg?.initDataUnsafe?.user?.first_name || "Игрок";
         
-        const SERVER_URL = "https://hosting-1-a0z6.onrender.com"; 
+        const SERVER_URL = "http://localhost:8000";  
 
         let board = Array(4).fill().map(() => Array(4).fill(0));
         let score = 0;
