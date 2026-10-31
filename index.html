@@ -70,31 +70,34 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 .btn-pub{width:100%;padding:14px;background:#d5d7db;color:#999;border:none;border-radius:4px;font-size:15px;font-weight:bold;cursor:not-allowed}
 .btn-pub.ready{background:#e31e24;color:#fff;cursor:pointer}
 
-/* --- ЭКРАН ДЕТАЛЕЙ --- */
+/* --- ЭКРАН ДЕТАЛЕЙ (ТОЧЬ-В-ТОЧЬ КАК НА СКРИНШОТЕ) --- */
 .detail-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
-.detail-title{font-size:22px;font-weight:600;display:flex;align-items:center;gap:10px}
-.btn-view{background-color:#e31e24;color:white;padding:10px 15px;border-radius:4px;font-weight:600;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:5px}
+.detail-title{font-size:20px;font-weight:700;display:flex;align-items:center;gap:10px}
+.btn-view{background-color:#e31e24;color:white;padding:8px 14px;border-radius:4px;font-weight:600;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:5px}
 .detail-layout{display:flex;gap:15px;align-items:flex-start}
 @media (max-width: 800px) { .detail-layout { flex-direction: column; } }
 .detail-left{width:45%;display:flex;flex-direction:column;gap:15px}
 @media (max-width: 800px) { .detail-left { width:100%; } }
 .image-card{background:white;border-radius:8px;padding:20px;display:flex;flex-direction:column;align-items:center;position:relative;min-height:200px;justify-content:center}
-.image-card img{width:100%;max-height:150px;object-fit:contain;margin-bottom:20px}
-.date-text{color:#888;font-size:14px;position:absolute;bottom:15px}
-.price-action-card{display:flex;justify-content:space-between;align-items:center;background:transparent}
-.price-info{display:flex;flex-direction:column}
-.price-label{color:#888;font-size:13px;margin-bottom:5px}
-.price-value{color:#e31e24;font-size:20px;font-weight:bold}
-.btn-remove{background-color:#e31e24;color:white;padding:12px 20px;border-radius:4px;font-weight:600;font-size:13px;border:none;cursor:pointer}
-.btn-buy-large{background-color:#e31e24;color:white;padding:12px 20px;border-radius:4px;font-weight:600;font-size:15px;border:none;cursor:pointer;width:100%}
+.image-card img{width:100%;max-height:140px;object-fit:contain;margin-bottom:25px}
+.date-text{color:#999;font-size:12px;position:absolute;bottom:15px}
+
+.price-action-card{display:flex;justify-content:space-between;align-items:center;background:transparent;padding:5px 0}
+.price-info{display:flex;flex-direction:column;text-align:center;width:100%}
+.price-label{color:#888;font-size:12px;margin-bottom:3px}
+.price-value{color:#e31e24;font-size:18px;font-weight:bold}
+
+.buy-box-layout{display:flex;justify-content:space-between;align-items:center;width:100%;gap:10px}
+.btn-buy-red{background-color:#e31e24;color:white;padding:10px 22px;border-radius:4px;font-weight:600;font-size:13px;border:none;cursor:pointer}
+
 .detail-right{width:55%;background:white;border-radius:8px;padding:20px}
 @media (max-width: 800px) { .detail-right { width:100%; } }
-.spec-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:14px}
+.spec-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px}
 .spec-label{color:#888}
 .spec-value{color:#222;font-weight:500}
 .divider{height:1px;background-color:#e0e0e0;margin:10px 0}
 .level-bar-container{display:flex;gap:4px}
-.level-segment{width:25px;height:6px;background-color:#e0e0e0;border-radius:3px}
+.level-segment{width:22px;height:5px;background-color:#e0e0e0;border-radius:3px}
 .level-segment.filled{background-color:#f1c40f}
 
 /* Уведомления */
@@ -110,7 +113,7 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 <div class="logo"><div class="logo-ic">e</div><div>grand<span>auto</span></div></div>
 </div>
 <div class="h-right">
-<div class="bal"><div class="bal-amt" id="u-bal">...</div><div class="bal-lbl">БАЛАНС</div></div>
+<div class="bal"><div class="bal-amt" id="u-bal">0$</div><div class="bal-lbl">БАЛАНС</div></div>
 <button class="btn-t btn-dark" onclick="openMyAds()">📄 Мои</button>
 <button class="btn-t btn-red" onclick="openSellMenu()">➕ Подать</button>
 </div>
@@ -162,11 +165,12 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 <button class="btn-pub" id="pub-btn" onclick="confirmPub()">Опубликовать</button>
 </div>
 
+<!-- СЕКЦИЯ ДЕТАЛЕЙ КАРТОЧКИ (КАК НА СКРИНЕ) -->
 <div id="page-detail" class="container page">
     <div class="detail-header">
         <div class="detail-title">
             <button class="btn-t btn-dark" onclick="goBack()">Назад</button>
-            <span id="det-name">Автомобиль</span>
+            <span id="det-name">Bugatti Bolide</span>
         </div>
         <button class="btn-view" onclick="goBack()">👁 Посмотреть</button>
     </div>
@@ -175,37 +179,47 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
         <div class="detail-left">
             <div class="image-card">
                 <img src="" id="det-img" alt="Car">
-                <div class="date-text" id="det-date">Продается до...</div>
+                <div class="date-text" id="det-date">Продается до 2 ноября</div>
             </div>
 
-            <div class="price-action-card" id="det-action-own" style="display:none;">
-                <div class="price-info">
-                    <span class="price-label">Стоимость на дроме</span>
-                    <span class="price-value" id="det-price-own"></span>
-                </div>
-                <button class="btn-remove" onclick="removeMyAd()">Снять с продажи</button>
-            </div>
-
+            <!-- Блок для чужой машины (Цена + кнопка "купить") -->
             <div class="price-action-card" id="det-action-buy" style="display:none;">
-                <button class="btn-buy-large" onclick="buyCar()">Купить за <span id="det-price-buy"></span></button>
+                <div class="buy-box-layout">
+                    <div class="price-info" style="text-align:left;">
+                        <span class="price-label">Стоимость на дроме</span>
+                        <span class="price-value" id="det-price-buy">320 000 000$</span>
+                    </div>
+                    <button class="btn-buy-red" onclick="buyCar()">купить</button>
+                </div>
+            </div>
+
+            <!-- Блок для своей машины (Снять с продажи) -->
+            <div class="price-action-card" id="det-action-own" style="display:none;">
+                <div class="buy-box-layout">
+                    <div class="price-info" style="text-align:left;">
+                        <span class="price-label">Стоимость на дроме</span>
+                        <span class="price-value" id="det-price-own">0$</span>
+                    </div>
+                    <button class="btn-buy-red" onclick="removeMyAd()">Снять</button>
+                </div>
             </div>
         </div>
 
         <div class="detail-right">
-            <div class="spec-row"><span class="spec-label">Владелец</span><span class="spec-value" id="det-seller">-</span></div>
-            <div class="spec-row"><span class="spec-label">Гос. стоимость</span><span class="spec-value" style="color:#888" id="det-gov-price">-</span></div>
-            <div class="spec-row"><span class="spec-label">Гос. номер</span><span class="spec-value">[B001OP|99RUS]</span></div>
-            <div class="spec-row"><span class="spec-label">Пробег</span><span class="spec-value" id="det-mileage">0 км</span></div>
-            <div class="spec-row"><span class="spec-label">Владельцев</span><span class="spec-value">1</span></div>
-            <div class="spec-row"><span class="spec-label">Цвет фар</span><span class="spec-value"><div style="width:15px;height:15px;background:#e3f2fd;border-radius:50%"></div></span></div>
+            <div class="spec-row"><span class="spec-label">Владелец</span><span class="spec-value" id="det-seller">Jonatan_Edgar</span></div>
+            <div class="spec-row"><span class="spec-label">Гос. стоимость</span><span class="spec-value" id="det-gov-price">110 000 000$</span></div>
+            <div class="spec-row"><span class="spec-label">Гос. номер</span><span class="spec-value" id="det-number">-</span></div>
+            <div class="spec-row"><span class="spec-label">Пробег</span><span class="spec-value" id="det-mileage">7 км</span></div>
+            <div class="spec-row"><span class="spec-label">Владельцев</span><span class="spec-value" id="det-owners">10</span></div>
+            <div class="spec-row"><span class="spec-label">Цвет фар</span><span class="spec-value"></span></div>
             
             <div class="divider"></div>
 
-            <div class="spec-row"><span class="spec-label">Двигатель</span><div style="display:flex;align-items:center;gap:10px"><span id="det-engine-txt" class="spec-value"></span><div class="level-bar-container" id="det-engine-bar"></div></div></div>
-            <div class="spec-row"><span class="spec-label">Турбонаддув</span><div style="display:flex;align-items:center;gap:10px"><span id="det-turbo-txt" class="spec-value"></span><div class="level-bar-container" id="det-turbo-bar"></div></div></div>
-            <div class="spec-row"><span class="spec-label">Гидравлика</span><div style="display:flex;align-items:center;gap:10px"><span id="det-hydro-txt" class="spec-value"></span><div class="level-bar-container" id="det-hydro-bar"></div></div></div>
-            <div class="spec-row"><span class="spec-label">Чип</span><div style="display:flex;align-items:center;gap:10px"><span id="det-chip-txt" class="spec-value"></span><div class="level-bar-container" id="det-chip-bar"></div></div></div>
-            <div class="spec-row"><span class="spec-label">Тормоза</span><div style="display:flex;align-items:center;gap:10px"><span id="det-brakes-txt" class="spec-value"></span><div class="level-bar-container" id="det-brakes-bar"></div></div></div>
+            <div class="spec-row"><span class="spec-label">Двигатель</span><div style="display:flex;align-items:center;gap:10px"><span id="det-engine-txt" class="spec-value">5 Ур.</span><div class="level-bar-container" id="det-engine-bar"></div></div></div>
+            <div class="spec-row"><span class="spec-label">Турбонаддув</span><div style="display:flex;align-items:center;gap:10px"><span id="det-turbo-txt" class="spec-value">3 Ур.</span><div class="level-bar-container" id="det-turbo-bar"></div></div></div>
+            <div class="spec-row"><span class="spec-label">Гидравлика</span><div style="display:flex;align-items:center;gap:10px"><span id="det-hydro-txt" class="spec-value">0 Ур.</span><div class="level-bar-container" id="det-hydro-bar"></div></div></div>
+            <div class="spec-row"><span class="spec-label">Чип</span><div style="display:flex;align-items:center;gap:10px"><span id="det-chip-txt" class="spec-value">3 Ур.</span><div class="level-bar-container" id="det-chip-bar"></div></div></div>
+            <div class="spec-row"><span class="spec-label">Тормоза</span><div style="display:flex;align-items:center;gap:10px"><span id="det-brakes-txt" class="spec-value">3 Ур.</span><div class="level-bar-container" id="det-brakes-bar"></div></div></div>
         </div>
     </div>
 </div>
@@ -216,7 +230,6 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// Дефолтные картинки (если ты не установил свои через /setphoto)
 const DEFAULT_CARS = {
     "Ferrari 296 GTB": "https://pngimg.com/uploads/ferrari/ferrari_PNG102812.png",
     "BMW M3 G80": "https://pngimg.com/uploads/bmw/bmw_PNG1701.png",
@@ -227,10 +240,9 @@ const DEFAULT_CARS = {
 };
 const DEF_IMG = "https://cdn-icons-png.flaticon.com/512/3202/3202926.png";
 
-// Умная функция получения картинки (сначала из базы, потом из дефолтных)
 function getImg(carName, dbImg) {
-    if (dbImg && dbImg.length > 5) return dbImg; // Если бот прислал ссылку
-    return DEFAULT_CARS[carName] || DEF_IMG;     // Иначе дефолтная
+    if (dbImg && dbImg.length > 5) return dbImg;
+    return DEFAULT_CARS[carName] || DEF_IMG;
 }
 
 const API_URL = "http://127.0.0.1:8000"; 
@@ -240,7 +252,7 @@ let allAds = [], myAdsList = [], myCars = [];
 let currentAd = null, sellCar = null, selDaysVal = 1, hist = ['page-main'], carPage = 0;
 let modalMode = 'buy';
 
-function money(a) { return a.toLocaleString('ru-RU') + '$'; }
+function money(a) { return (a || 0).toLocaleString('ru-RU') + '$'; }
 function toast(m) { let t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 function updBal() { 
     fetch(`${API_URL}/api/user_balance?user_id=${USER_ID}`)
@@ -302,9 +314,11 @@ function openDetail(id, mode) {
     
     document.getElementById('det-name').textContent = a.name;
     document.getElementById('det-img').src = getImg(a.name, a.image_url);
-    document.getElementById('det-seller').textContent = a.seller_name || "Вы";
-    document.getElementById('det-gov-price').textContent = money(a.price * 0.8); 
-    document.getElementById('det-mileage').textContent = (Math.floor(Math.random() * 50) + 1) + " км";
+    document.getElementById('det-seller').textContent = a.seller_name || "Jonatan_Edgar";
+    document.getElementById('det-gov-price').textContent = money(a.gov_price || (a.price ? Math.floor(a.price * 0.5) : 110000000)); 
+    document.getElementById('det-mileage').textContent = (a.mileage || 7) + " км";
+    document.getElementById('det-owners').textContent = a.owners || 10;
+    document.getElementById('det-number').textContent = a.number || "-";
     
     function renderBar(barId, txtId, lvl) {
         document.getElementById(txtId).textContent = lvl + " Ур.";
@@ -315,13 +329,13 @@ function openDetail(id, mode) {
             b.appendChild(seg);
         }
     }
-    renderBar('det-engine-bar', 'det-engine-txt', a.engine || 0);
-    renderBar('det-turbo-bar', 'det-turbo-txt', a.turbo || 0);
-    renderBar('det-hydro-bar', 'det-hydro-txt', 0);
-    renderBar('det-chip-bar', 'det-chip-txt', Math.floor(Math.random() * 3));
-    renderBar('det-brakes-bar', 'det-brakes-txt', Math.floor(Math.random() * 3));
+    renderBar('det-engine-bar', 'det-engine-txt', a.engine !== undefined ? a.engine : 5);
+    renderBar('det-turbo-bar', 'det-turbo-txt', a.turbo !== undefined ? a.turbo : 3);
+    renderBar('det-hydro-bar', 'det-hydro-txt', a.hydro !== undefined ? a.hydro : 0);
+    renderBar('det-chip-bar', 'det-chip-txt', a.chip !== undefined ? a.chip : 3);
+    renderBar('det-brakes-bar', 'det-brakes-txt', a.brakes !== undefined ? a.brakes : 3);
 
-    let d = new Date(); d.setDate(d.getDate() + 3);
+    let d = new Date(); d.setDate(d.getDate() + 2);
     const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
     document.getElementById('det-date').textContent = `Продается до ${d.getDate()} ${months[d.getMonth()]}`;
 
@@ -334,7 +348,7 @@ function openDetail(id, mode) {
         document.getElementById('det-price-own').textContent = money(a.price);
     } else {
         ownBox.style.display = 'none';
-        buyBox.style.display = 'block';
+        buyBox.style.display = 'flex';
         document.getElementById('det-price-buy').textContent = money(a.price);
     }
     
