@@ -27,7 +27,7 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 .container{padding:10px;width:100%;max-width:1200px;margin:0 auto}
 .page{display:none}.page.active{display:block}
 
-/* --- ГЛАВНАЯ (СЕТКА) --- */
+/* --- ГЛАВНАЯ --- */
 .s-panel{display:flex;gap:5px;margin-bottom:10px}
 .s-box{flex:1;display:flex;align-items:center;background:#d5d7db;border-radius:4px;padding:0 8px}
 .s-box input{width:100%;background:transparent;border:none;padding:10px 0;font-size:12px;outline:none}
@@ -49,7 +49,7 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 .price-tag{background:#e31e24;color:#fff;font-weight:bold;font-size:9px;padding:2px 5px;border-radius:3px;align-self:flex-start;margin-bottom:4px;white-space:nowrap}
 .card-title{font-size:10px;font-weight:600;color:#222;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 
-/* --- ШАГИ ПОДАЧИ --- */
+/* --- ПОДАЧА --- */
 .step-head{display:flex;align-items:center;gap:10px;margin-bottom:15px}
 .step-txt{font-size:14px;color:#666}
 .cars-list{display:flex;gap:10px;flex-wrap:wrap}
@@ -90,7 +90,7 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 .btn-remove{background-color:#e31e24;color:white;padding:12px 20px;border-radius:4px;font-weight:600;font-size:13px;border:none;cursor:pointer}
 .btn-buy-large{background-color:#e31e24;color:white;padding:12px 20px;border-radius:4px;font-weight:600;font-size:15px;border:none;cursor:pointer;width:100%}
 
-/* Правая часть (Характеристики) */
+/* Правая часть */
 .detail-right{width:55%;background:white;border-radius:8px;padding:20px}
 @media (max-width: 800px) { .detail-right { width:100%; } }
 .spec-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:14px}
@@ -297,7 +297,7 @@ function renderMain() {
     `).join('');
 }
 
-// ЭКРАН ДЕТАЛЕЙ
+// ЭКРАН ДЕТАЛЕЙ (Единственное окно, которое теперь открывается)
 function openDetail(id, mode) {
     let a;
     if(mode === 'buy') { a = allAds.find(x => x.id === id); modalMode = 'buy'; } 
@@ -309,10 +309,9 @@ function openDetail(id, mode) {
     document.getElementById('det-name').textContent = a.name;
     document.getElementById('det-img').src = getImg(a.name);
     document.getElementById('det-seller').textContent = a.seller_name || "Вы";
-    document.getElementById('det-gov-price').textContent = money(a.price * 0.8); // Имитация
+    document.getElementById('det-gov-price').textContent = money(a.price * 0.8); 
     document.getElementById('det-mileage').textContent = (Math.floor(Math.random() * 50) + 1) + " км";
     
-    // Рисуем полоски (от 0 до 5)
     function renderBar(barId, txtId, lvl) {
         document.getElementById(txtId).textContent = lvl + " Ур.";
         let b = document.getElementById(barId); b.innerHTML = '';
@@ -325,15 +324,13 @@ function openDetail(id, mode) {
     renderBar('det-engine-bar', 'det-engine-txt', a.engine || 0);
     renderBar('det-turbo-bar', 'det-turbo-txt', a.turbo || 0);
     renderBar('det-hydro-bar', 'det-hydro-txt', 0);
-    renderBar('det-chip-bar', 'det-chip-txt', Math.floor(Math.random() * 3)); // Имитация
+    renderBar('det-chip-bar', 'det-chip-txt', Math.floor(Math.random() * 3));
     renderBar('det-brakes-bar', 'det-brakes-txt', Math.floor(Math.random() * 3));
 
-    // Дата
     let d = new Date(); d.setDate(d.getDate() + 3);
     const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
     document.getElementById('det-date').textContent = `Продается до ${d.getDate()} ${months[d.getMonth()]}`;
 
-    // Кнопки
     let ownBox = document.getElementById('det-action-own');
     let buyBox = document.getElementById('det-action-buy');
     
@@ -384,7 +381,7 @@ function removeMyAd() {
     .catch(err => toast("❌ Ошибка сервера"));
 }
 
-// ОСТАЛЬНОЕ (Подача)
+// ОСТАЛЬНОЕ
 function openSellMenu() {
     showPage('page-step1');
     let g = document.getElementById('garage-grid');
