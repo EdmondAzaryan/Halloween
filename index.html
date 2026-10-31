@@ -6,7 +6,7 @@
 <title>Grand Auto</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-/* --- БАЗА --- */
+/* --- БАЗОВЫЕ СТИЛИ --- */
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
 body{background:#eaebef;color:#333;font-size:13px;overflow-x:hidden;width:100%}
 header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;height:55px;position:sticky;top:0;z-index:100}
@@ -70,14 +70,12 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 .btn-pub{width:100%;padding:14px;background:#d5d7db;color:#999;border:none;border-radius:4px;font-size:15px;font-weight:bold;cursor:not-allowed}
 .btn-pub.ready{background:#e31e24;color:#fff;cursor:pointer}
 
-/* --- ЭКРАН ДЕТАЛЕЙ (КАК НА СКРИНШОТЕ) --- */
+/* --- ЭКРАН ДЕТАЛЕЙ --- */
 .detail-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
 .detail-title{font-size:22px;font-weight:600;display:flex;align-items:center;gap:10px}
 .btn-view{background-color:#e31e24;color:white;padding:10px 15px;border-radius:4px;font-weight:600;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:5px}
 .detail-layout{display:flex;gap:15px;align-items:flex-start}
 @media (max-width: 800px) { .detail-layout { flex-direction: column; } }
-
-/* Левая часть */
 .detail-left{width:45%;display:flex;flex-direction:column;gap:15px}
 @media (max-width: 800px) { .detail-left { width:100%; } }
 .image-card{background:white;border-radius:8px;padding:20px;display:flex;flex-direction:column;align-items:center;position:relative;min-height:200px;justify-content:center}
@@ -89,8 +87,6 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 .price-value{color:#e31e24;font-size:20px;font-weight:bold}
 .btn-remove{background-color:#e31e24;color:white;padding:12px 20px;border-radius:4px;font-weight:600;font-size:13px;border:none;cursor:pointer}
 .btn-buy-large{background-color:#e31e24;color:white;padding:12px 20px;border-radius:4px;font-weight:600;font-size:15px;border:none;cursor:pointer;width:100%}
-
-/* Правая часть */
 .detail-right{width:55%;background:white;border-radius:8px;padding:20px}
 @media (max-width: 800px) { .detail-right { width:100%; } }
 .spec-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:14px}
@@ -120,7 +116,6 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 </div>
 </header>
 
-<!-- ГЛАВНАЯ -->
 <div id="page-main" class="container page active">
 <div class="s-panel">
 <div class="s-box"><span>🔍</span><input type="text" id="search-name" placeholder="Поиск" oninput="renderMain()"></div>
@@ -136,19 +131,16 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 <div class="grid" id="main-grid"></div>
 </div>
 
-<!-- МОИ -->
 <div id="page-my" class="container page">
 <h2 style="text-align:center; margin: 15px 0;">Мои объявления</h2>
 <div class="grid" id="my-grid"></div>
 </div>
 
-<!-- ШАГ 1 -->
 <div id="page-step1" class="container page">
 <div class="step-head"><button class="btn-t btn-dark" onclick="goBack()">Назад</button><div class="step-txt"><b>Шаг 1/2</b><br>Выберите автомобиль из гаража</div></div>
 <div class="cars-list" id="garage-grid"></div>
 </div>
 
-<!-- ШАГ 2 -->
 <div id="page-step2" class="container page">
 <div class="step-head"><button class="btn-t btn-dark" onclick="showPage('page-step1')">Назад</button><div class="step-txt"><b>Шаг 2/2</b><br>Настройте детали</div></div>
 <div class="cfg-block">
@@ -170,7 +162,6 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 <button class="btn-pub" id="pub-btn" onclick="confirmPub()">Опубликовать</button>
 </div>
 
-<!-- ЭКРАН ДЕТАЛЕЙ АВТО -->
 <div id="page-detail" class="container page">
     <div class="detail-header">
         <div class="detail-title">
@@ -181,7 +172,6 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
     </div>
 
     <div class="detail-layout">
-        <!-- Левая часть -->
         <div class="detail-left">
             <div class="image-card">
                 <img src="" id="det-img" alt="Car">
@@ -201,7 +191,6 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
             </div>
         </div>
 
-        <!-- Правая часть -->
         <div class="detail-right">
             <div class="spec-row"><span class="spec-label">Владелец</span><span class="spec-value" id="det-seller">-</span></div>
             <div class="spec-row"><span class="spec-label">Гос. стоимость</span><span class="spec-value" style="color:#888" id="det-gov-price">-</span></div>
@@ -227,7 +216,8 @@ header{background:#1c1c1e;color:#fff;display:flex;justify-content:space-between;
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const CAR_IMGS = {
+// Дефолтные картинки (если ты не установил свои через /setphoto)
+const DEFAULT_CARS = {
     "Ferrari 296 GTB": "https://pngimg.com/uploads/ferrari/ferrari_PNG102812.png",
     "BMW M3 G80": "https://pngimg.com/uploads/bmw/bmw_PNG1701.png",
     "McLaren 720s": "https://pngimg.com/uploads/mclaren/mclaren_PNG28.png",
@@ -236,7 +226,12 @@ const CAR_IMGS = {
     "Magnaris 2107": "https://pngimg.com/uploads/lada/lada_PNG27.png"
 };
 const DEF_IMG = "https://cdn-icons-png.flaticon.com/512/3202/3202926.png";
-function getImg(name) { return CAR_IMGS[name] || DEF_IMG; }
+
+// Умная функция получения картинки (сначала из базы, потом из дефолтных)
+function getImg(carName, dbImg) {
+    if (dbImg && dbImg.length > 5) return dbImg; // Если бот прислал ссылку
+    return DEFAULT_CARS[carName] || DEF_IMG;     // Иначе дефолтная
+}
 
 const API_URL = "http://127.0.0.1:8000"; 
 const USER_ID = new URLSearchParams(window.location.search).get('uid') || tg.initDataUnsafe?.user?.id || 1;
@@ -280,7 +275,7 @@ function renderMain() {
     
     document.getElementById('car-top').innerHTML = f.map(a => `
         <div class="card" onclick="openDetail(${a.id}, 'buy')">
-            <div class="img-box"><img src="${getImg(a.name)}" onerror="this.src='${DEF_IMG}'"></div>
+            <div class="img-box"><img src="${getImg(a.name, a.image_url)}" onerror="this.src='${DEF_IMG}'"></div>
             <div class="price-tag">${money(a.price)}</div>
             <div class="card-title">${a.name}</div>
         </div>
@@ -290,14 +285,13 @@ function renderMain() {
     let g = document.getElementById('main-grid');
     g.innerHTML = f.length===0 ? '<div style="grid-column:span 4;text-align:center;padding:20px;color:#888">Объявлений пока нет</div>' : f.map(a => `
         <div class="card" onclick="openDetail(${a.id}, 'buy')">
-            <div class="img-box"><img src="${getImg(a.name)}" onerror="this.src='${DEF_IMG}'"></div>
+            <div class="img-box"><img src="${getImg(a.name, a.image_url)}" onerror="this.src='${DEF_IMG}'"></div>
             <div class="price-tag">${money(a.price)}</div>
             <div class="card-title">${a.name}</div>
         </div>
     `).join('');
 }
 
-// ЭКРАН ДЕТАЛЕЙ (Единственное окно, которое теперь открывается)
 function openDetail(id, mode) {
     let a;
     if(mode === 'buy') { a = allAds.find(x => x.id === id); modalMode = 'buy'; } 
@@ -307,7 +301,7 @@ function openDetail(id, mode) {
     currentAd = a;
     
     document.getElementById('det-name').textContent = a.name;
-    document.getElementById('det-img').src = getImg(a.name);
+    document.getElementById('det-img').src = getImg(a.name, a.image_url);
     document.getElementById('det-seller').textContent = a.seller_name || "Вы";
     document.getElementById('det-gov-price').textContent = money(a.price * 0.8); 
     document.getElementById('det-mileage').textContent = (Math.floor(Math.random() * 50) + 1) + " км";
@@ -347,7 +341,6 @@ function openDetail(id, mode) {
     showPage('page-detail');
 }
 
-// ПОКУПКА
 function buyCar() { 
     if(!currentAd) return;
     fetch(`${API_URL}/api/buy_car`, {
@@ -364,7 +357,6 @@ function buyCar() {
     .catch(err => toast("❌ Ошибка сервера"));
 }
 
-// СНЯТИЕ
 function removeMyAd() {
     if(!currentAd) return;
     fetch(`${API_URL}/api/remove_ad`, {
@@ -381,7 +373,6 @@ function removeMyAd() {
     .catch(err => toast("❌ Ошибка сервера"));
 }
 
-// ОСТАЛЬНОЕ
 function openSellMenu() {
     showPage('page-step1');
     let g = document.getElementById('garage-grid');
@@ -393,7 +384,7 @@ function openSellMenu() {
             if(myCars.length === 0) { g.innerHTML = '<div style="text-align:center; width:100%; padding:20px; color:#888;">У вас нет машин</div>'; return; }
             g.innerHTML = myCars.map(c => `
                 <div class="sell-card" onclick="startSell('${c.name}')">
-                    <img src="${getImg(c.name)}" onerror="this.src='${DEF_IMG}'">
+                    <img src="${getImg(c.name, c.image_url)}" onerror="this.src='${DEF_IMG}'">
                     <div class="card-title">${c.name}</div>
                     <div style="font-size:10px; color:#888; align-self:flex-start;">⚡ ${c.speed} км/ч · ⭐ ${c.stars}</div>
                 </div>
@@ -434,7 +425,7 @@ function openMyAds() {
             else {
                 g.innerHTML = data.map(a => `
                     <div class="card" onclick="openDetail(${a.id}, 'my_ad')">
-                        <div class="img-box"><img src="${getImg(a.name)}" onerror="this.src='${DEF_IMG}'"></div>
+                        <div class="img-box"><img src="${getImg(a.name, a.image_url)}" onerror="this.src='${DEF_IMG}'"></div>
                         <div class="price-tag">${money(a.price)}</div>
                         <div class="card-title">${a.name}</div>
                     </div>
@@ -443,6 +434,10 @@ function openMyAds() {
         })
         .catch(err => g.innerHTML = '<div style="grid-column:span 4;text-align:center;color:red">Ошибка</div>');
 }
+
+function openFilterModal() {}
+function closeFilterModal() {}
+function applyFilter() {}
 
 updBal(); loadAds(); 
 </script>
